@@ -3,7 +3,14 @@
    uma mensagem de WhatsApp. Preços aqui devem bater com os das páginas e
    com Precificacao-produtos.xlsx. Criado em 03/10/2026; em 03/10/2026 o sabor
    dos produtos novos passou a ser escolhido por botões (chocolate 50% cacau,
-   Ninho ou casadinho), sem acréscimo. */
+   Ninho ou casadinho), sem acréscimo. Em 04/10/2026 o horário de retirada
+   passou a ser obrigatório no checkout e o link "Meu pedido" saiu do menu de
+   categorias para o canto superior direito de todas as páginas (.cart-link).
+   Ainda em 04/10/2026 a página de tortas passou a ter um formulário por linha
+   (data-linha="Clássicos" | "Especiais" | "Premium"; vazio = outro sabor, a
+   combinar), tamanho e sabor por botões, e os adicionais escolhidos num popup
+   compartilhado ([data-addons-picker]); o Bentô escolhe opção e sabor por
+   botões. A mensagem do WhatsApp não mudou de formato. */
 (function () {
   'use strict';
 
@@ -57,13 +64,18 @@
   function escapar(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function uid() { return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
-  /* ---------- contador fixo e link do menu ---------- */
+  /* ---------- contador fixo e botão "Meu pedido" do canto ---------- */
   function atualizarContadores(itens) {
     var n = totalQtd(itens || lerPedido());
     document.querySelectorAll('[data-pedido-contador]').forEach(function (el) { el.textContent = n; });
     var fab = document.querySelector('.cart-fab');
     if (fab) fab.hidden = n === 0 || document.body.classList.contains('pedido-page');
-    document.querySelectorAll('.nav-pedido').forEach(function (a) { a.classList.toggle('has-items', n > 0); a.dataset.n = n; });
+    // .cart-link: pílula do canto superior direito (todas as páginas); o número só aparece com itens
+    document.querySelectorAll('.cart-link, .nav-pedido').forEach(function (a) {
+      a.classList.toggle('has-items', n > 0);
+      a.dataset.n = n;
+      if (a.classList.contains('cart-link')) a.setAttribute('aria-label', 'Meu pedido' + (n > 0 ? ', ' + n + (n === 1 ? ' item' : ' itens') : ', vazio'));
+    });
   }
   function montarFab() {
     if (document.querySelector('.cart-fab')) return;
@@ -97,7 +109,8 @@
       item.detalhes.push(base.opcao + ': ' + (saborEscolhido ? saborEscolhido.value : ''));
     } else if (tipo === 'bento') {
       var op = form.querySelector('[name=opcao]:checked').value;
-      var sabor = form.querySelector('[name=sabor]').value;
+      var saborB = form.querySelector('[name=sabor]:checked');
+      var sabor = saborB ? saborB.value : '';
       item.nome = 'Bentô Cake (aprox. 300 g)';
       item.preco = BENTO[op].preco + (sabor === 'Ninho com geleia de morango' ? BENTO.geleia : 0);
       item.detalhes.push(BENTO[op].nome);
@@ -105,57 +118,169 @@
       var escrita = form.querySelector('[name=escrita]').value.trim();
       if (escrita) item.detalhes.push('Escrita/decoração: ' + escrita);
     } else if (tipo === 'torta') {
+      // um formulário por linha: data-linha diz a linha (Clássicos, Especiais, Premium); vazio é "outro sabor", a combinar
       var tam = form.querySelector('[name=tamanho]:checked').value;
-      var sel = form.querySelector('[name=sabor]');
-      var opt = sel.options[sel.selectedIndex];
-      var linha = opt.dataset.linha || '';
-      var saborT = opt.value;
-      if (saborT === 'Outro') {
+      var linha = form.dataset.linha || '';
+      var saborT;
+      if (!linha || !TORTA.linhas[linha]) {
         var outro = form.querySelector('[name=outro]').value.trim();
         saborT = 'Outro sabor: ' + (outro || 'a combinar');
         item.preco = null;
       } else {
+        var saborEscolhidoT = form.querySelector('[name=sabor]:checked');
+        saborT = saborEscolhidoT ? saborEscolhidoT.value : '';
         item.preco = TORTA.linhas[linha][tam];
-        if (saborT === 'Morangos') saborT = 'Morangos com ' + form.querySelector('[name=morangos]').value;
+        if (saborT === 'Morangos') {
+          var creme = form.querySelector('[name=morangos]:checked');
+          saborT = 'Morangos com ' + (creme ? creme.value : '');
+        }
       }
       item.nome = 'Torta ' + TORTA.tamanhos[tam];
       item.detalhes.push(saborT + (linha ? ' (' + linha + ')' : ''));
-      form.querySelectorAll('[name=adicional]:checked').forEach(function (c) {
-        item.extras.push({ nome: c.value, aPartir: parseFloat(c.dataset.preco) });
+      (form._adicionais || []).forEach(function (a) {
+        item.extras.push({ nome: a.nome, aPartir: a.aPartir });
       });
       var deco = form.querySelector('[name=decoracao]').value.trim();
       if (deco) item.obs = 'Decoração: ' + deco;
     }
     return item;
   }
+
+  /* ---------- popup de adicionais e decoração (tortas, 04/10/2026) ----------
+     A seção [data-addons-picker] existe no HTML (sem JavaScript é uma lista
+     comum, com fotos e valores). Com JavaScript ela sai do painel, vira um
+     popup compartilhado pelos formulários de torta e guarda a escolha em
+     form._adicionais; o card mostra o resumo. Fechar por X, toque fora ou Esc
+     mantém o que estava marcado; "Não quero adicionais" desmarca tudo. */
+  var abrirAdicionais = null;
+  function iniciarAdicionais() {
+    var picker = document.querySelector('[data-addons-picker]');
+    if (!picker) return;
+    var caixa = picker.querySelector('.addons-box');
+    var caixas = Array.prototype.slice.call(picker.querySelectorAll('[name=adicional]'));
+    var concluir = picker.querySelector('[data-addons-done]');
+    var nenhum = picker.querySelector('[data-addons-none]');
+    var fechar = picker.querySelector('[data-addons-close]');
+    var painel = document.querySelector('.panel');
+    var formAtivo = null, origem = null;
+    var menor = caixas.reduce(function (m, c) { var p = parseFloat(c.dataset.preco); return isNaN(p) ? m : Math.min(m, p); }, Infinity);
+    var dica = caixas.length + ' opções com foto' + (isFinite(menor) ? ', valores a partir de ' + moeda(menor) : '');
+
+    document.body.appendChild(picker);
+    picker.classList.add('enhanced');
+    picker.hidden = true;
+    picker.setAttribute('role', 'dialog');
+    picker.setAttribute('aria-modal', 'true');
+
+    function lightboxAberto() { return document.body.classList.contains('lightbox-open'); }
+    function focaveis() {
+      return Array.prototype.filter.call(picker.querySelectorAll('button, a[href], input'), function (el) {
+        return !el.disabled && el.offsetParent !== null;
+      });
+    }
+    function escolhidos() {
+      return caixas.filter(function (c) { return c.checked; }).map(function (c) { return { nome: c.value, aPartir: parseFloat(c.dataset.preco) }; });
+    }
+    function atualizarConcluir() {
+      var n = caixas.filter(function (c) { return c.checked; }).length;
+      concluir.textContent = n ? 'Concluir (' + n + (n === 1 ? ' escolhido)' : ' escolhidos)') : 'Concluir';
+    }
+    function resumo(form) {
+      var lista = form._adicionais || [];
+      var el = form.querySelector('[data-addons-summary]');
+      var acao = form.querySelector('[data-addons-action]');
+      var botao = form.querySelector('[data-addons-open]');
+      if (!el) return;
+      if (lista.length) {
+        el.innerHTML = '<strong>' + lista.length + (lista.length === 1 ? ' escolhido' : ' escolhidos') + '</strong><small>' +
+          escapar(lista.map(function (a) { return a.nome; }).join(', ')) + '</small>';
+        if (acao) acao.textContent = 'Alterar';
+      } else {
+        el.innerHTML = '<strong>Nenhum adicional</strong><small>' + escapar(dica) + '</small>';
+        if (acao) acao.textContent = 'Escolher';
+      }
+      if (botao) botao.classList.toggle('has-addons', lista.length > 0);
+    }
+    function abrir(form, botao) {
+      formAtivo = form; origem = botao;
+      var marcados = (form._adicionais || []).map(function (a) { return a.nome; });
+      caixas.forEach(function (c) { c.checked = marcados.indexOf(c.value) > -1; });
+      atualizarConcluir();
+      picker.hidden = false;
+      caixa.scrollTop = 0;
+      document.body.classList.add('picker-open');
+      if (painel && 'inert' in painel) painel.inert = true;
+      fechar.focus();
+    }
+    function encerrar(guardar) {
+      if (picker.hidden) return;
+      if (formAtivo) {
+        if (!guardar) caixas.forEach(function (c) { c.checked = false; });
+        formAtivo._adicionais = escolhidos();
+        resumo(formAtivo);
+      }
+      picker.hidden = true;
+      document.body.classList.remove('picker-open');
+      if (painel && 'inert' in painel) painel.inert = false;
+      if (origem) origem.focus();
+      formAtivo = null; origem = null;
+    }
+    caixas.forEach(function (c) { c.addEventListener('change', atualizarConcluir); });
+    concluir.addEventListener('click', function () { encerrar(true); });
+    nenhum.addEventListener('click', function () { encerrar(false); });
+    fechar.addEventListener('click', function () { encerrar(true); });
+    picker.addEventListener('click', function (event) { if (event.target === picker) encerrar(true); });
+    document.addEventListener('keydown', function (event) {
+      // o popup de foto (site.js) trata o Esc antes e marca o evento; nesse caso só ele fecha
+      if (picker.hidden || lightboxAberto() || event.defaultPrevented) return;
+      if (event.key === 'Escape') { event.preventDefault(); encerrar(true); return; }
+      if (event.key !== 'Tab') return;
+      var lista = focaveis();
+      if (!lista.length) return;
+      var primeiro = lista[0], ultimo = lista[lista.length - 1];
+      if (event.shiftKey && (document.activeElement === primeiro || !picker.contains(document.activeElement))) { event.preventDefault(); ultimo.focus(); }
+      else if (!event.shiftKey && (document.activeElement === ultimo || !picker.contains(document.activeElement))) { event.preventDefault(); primeiro.focus(); }
+    });
+    // o popup de foto, ao fechar, libera o painel; com o popup de adicionais ainda aberto, o painel volta a ficar inerte
+    document.addEventListener('focusin', function (event) {
+      if (picker.hidden || lightboxAberto()) return;
+      if (painel && 'inert' in painel && !painel.inert) painel.inert = true;
+      if (!picker.contains(event.target)) fechar.focus();
+    });
+    abrirAdicionais = abrir;
+    document.querySelectorAll('form[data-produto=torta]').forEach(function (form) {
+      form._adicionais = [];
+      resumo(form);
+    });
+  }
   function ligarFormulario(form) {
     var qtd = form.querySelector('[name=qtd]');
     form.querySelectorAll('[data-menos]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.max(1, (parseInt(qtd.value, 10) || 1) - 1); }); });
     form.querySelectorAll('[data-mais]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.min(99, (parseInt(qtd.value, 10) || 1) + 1); }); });
-    var sel = form.querySelector('[name=sabor]');
-    if (form.dataset.produto === 'torta' && sel) {
+    if (form.dataset.produto === 'torta') {
+      // tamanho e sabor por botões; a prévia mostra o valor do tamanho escolhido (ou "a combinar" no card de outro sabor)
+      var linhaT = form.dataset.linha || '';
+      var campoMorangos = form.querySelector('[data-campo=morangos]');
       var atualizar = function () {
-        var v = sel.value;
-        form.querySelector('[data-campo=morangos]').hidden = v !== 'Morangos';
-        form.querySelector('[data-campo=outro]').hidden = v !== 'Outro';
-        var opt = sel.options[sel.selectedIndex];
+        var sabor = form.querySelector('[name=sabor]:checked');
         var tam = form.querySelector('[name=tamanho]:checked');
+        if (campoMorangos) campoMorangos.hidden = !(sabor && sabor.value === 'Morangos');
         var previa = form.querySelector('[data-previa]');
-        if (previa) {
-          if (v === 'Outro' || !opt.dataset.linha || !tam) previa.textContent = v === 'Outro' ? 'Valor a combinar' : '';
-          else previa.textContent = moeda(TORTA.linhas[opt.dataset.linha][tam.value]) + ' · ' + opt.dataset.linha;
-        }
+        if (!previa) return;
+        if (!linhaT || !TORTA.linhas[linhaT]) previa.textContent = 'Valor a combinar';
+        else previa.textContent = tam ? moeda(TORTA.linhas[linhaT][tam.value]) + ' · tamanho ' + tam.value : '';
       };
-      sel.addEventListener('change', atualizar);
-      form.querySelectorAll('[name=tamanho]').forEach(function (r) { r.addEventListener('change', atualizar); });
+      form.querySelectorAll('[name=tamanho],[name=sabor]').forEach(function (r) { r.addEventListener('change', atualizar); });
       atualizar();
+      var botaoAdicionais = form.querySelector('[data-addons-open]');
+      if (botaoAdicionais) botaoAdicionais.addEventListener('click', function () { if (abrirAdicionais) abrirAdicionais(form, botaoAdicionais); });
     }
     if (form.dataset.produto === 'bento') {
       var previaB = form.querySelector('[data-previa]');
       var atualizarB = function () {
         var op = form.querySelector('[name=opcao]:checked');
-        var sb = form.querySelector('[name=sabor]').value;
-        if (previaB && op) previaB.textContent = moeda(BENTO[op.value].preco + (sb === 'Ninho com geleia de morango' ? BENTO.geleia : 0));
+        var sb = form.querySelector('[name=sabor]:checked');
+        if (previaB && op) previaB.textContent = moeda(BENTO[op.value].preco + (sb && sb.value === 'Ninho com geleia de morango' ? BENTO.geleia : 0));
       };
       form.querySelectorAll('[name=opcao],[name=sabor]').forEach(function (el) { el.addEventListener('change', atualizarB); });
       atualizarB();
@@ -169,6 +294,11 @@
       toast(item.qtd + '× ' + item.nome + ' no seu pedido');
       var fab = document.querySelector('.cart-fab');
       if (fab) { fab.classList.add('pulse'); setTimeout(function () { fab.classList.remove('pulse'); }, 700); }
+      // a pílula "Meu pedido" do canto pulsa ao receber um item (04/10/2026)
+      document.querySelectorAll('.cart-link').forEach(function (a) {
+        a.classList.remove('bump'); void a.offsetWidth; a.classList.add('bump');
+        setTimeout(function () { a.classList.remove('bump'); }, 600);
+      });
     });
     form.classList.add('enhanced');
   }
@@ -275,16 +405,23 @@
     horaEl.addEventListener('change', conferirData);
     nomeEl.addEventListener('input', function () { if (nomeEl.value.trim().length >= 2) mostrarErro('nome', ''); });
     dataEl.addEventListener('input', function () { if (dataEl.value) mostrarErro('data', ''); });
+    horaEl.addEventListener('input', function () { if (horaEl.value) mostrarErro('hora', ''); });
 
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var itens = lerPedido();
       if (!itens.length) return;
       var nome = nomeEl.value.trim();
-      var ok = true;
-      if (nome.length < 2) { mostrarErro('nome', 'Informe seu nome para enviar o pedido.'); ok = false; } else mostrarErro('nome', '');
-      if (!dataEl.value) { mostrarErro('data', 'Escolha a data de retirada desejada.'); ok = false; } else mostrarErro('data', '');
-      if (!ok) { (nome.length < 2 ? nomeEl : dataEl).focus(); return; }
+      // nome, data e horário de retirada são obrigatórios (horário desde 04/10/2026); o primeiro campo com erro recebe o foco
+      var primeiroErro = null;
+      function exigir(campo, el, valido, msg) {
+        mostrarErro(campo, valido ? '' : msg);
+        if (!valido && !primeiroErro) primeiroErro = el;
+      }
+      exigir('nome', nomeEl, nome.length >= 2, 'Informe seu nome para enviar o pedido.');
+      exigir('data', dataEl, !!dataEl.value, 'Escolha a data de retirada desejada.');
+      exigir('hora', horaEl, !!horaEl.value, 'Informe o horário de retirada desejado.');
+      if (primeiroErro) { primeiroErro.focus(); return; }
       var pag = form.querySelector('[name=pagamento]:checked');
       var dados = {
         nome: nome,
@@ -330,6 +467,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     montarFab();
+    iniciarAdicionais();
     document.querySelectorAll('form[data-produto]').forEach(ligarFormulario);
     if (document.querySelector('[data-checkout]')) iniciarCheckout();
     atualizarContadores(lerPedido());

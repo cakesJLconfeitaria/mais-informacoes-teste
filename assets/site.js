@@ -1,5 +1,7 @@
 (function () {
   'use strict';
+  // Marca que há JavaScript: o CSS esconde .js-only quando não há (html:not(.js)); 04/10/2026
+  document.documentElement.classList.add('js');
   function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
     var meta = document.querySelector('meta[name="theme-color"]');
