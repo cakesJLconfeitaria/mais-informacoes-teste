@@ -26,7 +26,7 @@
 .qty button:hover{background:var(--soft)}
 .qty input{width:46px;height:40px;border:0;border-left:1px solid var(--line);border-right:1px solid var(--line);text-align:center;font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:transparent;-moz-appearance:textfield}
 .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.price-preview{font-size:13px;font-weight:600;color:var(--ink);min-height:18px}
+
 .order-form .button{width:100%}
 html:not(.js) .js-only{display:none}
 .order-form.enhanced+noscript{display:none}
@@ -40,7 +40,7 @@ html:not(.js) .js-only{display:none}
 /* "Meu pedido" no canto superior direito, ao lado do botão de tema, em todas as páginas (04/10/2026); o número só aparece com itens */
 .cart-link{position:absolute;top:15px;right:59px;height:36px;display:inline-flex;align-items:center;gap:6px;padding:0 12px 0 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--accent);font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;transition:border-color .15s,background .15s}
 .cart-link svg{width:16px;height:16px;flex-shrink:0}
-.cart-link:hover,.cart-link[aria-current=page]{border-color:var(--line-strong);background:var(--soft)}
+.cart-link:hover{border-color:var(--line-strong);background:var(--soft)}
 .cart-link-n{display:none;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent);color:#fff;font-size:10px;line-height:1;font-variant-numeric:tabular-nums}
 .cart-link.has-items .cart-link-n{display:inline-grid}
 [data-theme=dark] .cart-link-n{color:#321820}
@@ -71,9 +71,9 @@ html:not(.js) .js-only{display:none}
 .message-preview{margin-top:14px}
 .message-preview summary{font-size:11px;color:var(--muted);cursor:pointer}
 .message-preview pre{white-space:pre-wrap;font:11px/1.6 Inter,sans-serif;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-top:8px;color:var(--ink)}
-.empty-state{text-align:center;padding:26px 10px;color:var(--muted);font-size:12px;display:grid;gap:12px;justify-items:center}
-.empty-state .links{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.empty-state .links a{font-size:11px;color:var(--accent);background:var(--soft);padding:7px 11px;border-radius:8px;text-decoration:none}
+
+
+
 .limpar{border:0;background:transparent;color:var(--muted);font-size:11px;text-decoration:underline;justify-self:start;padding:0}
 @media(max-width:380px){.choice-grid{grid-template-columns:1fr 1fr 1fr;gap:5px}.choice-grid label{padding:9px 4px;font-size:11px}.checkout .two-cols{grid-template-columns:1fr}}
 
@@ -218,3 +218,49 @@ html:not(.js) .bento-pick input,html:not(.js) .pick-dot{display:none}
 @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
 .cart-link.bump{animation:bump .45s ease-out}
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+/* P22 (04/10/2026): na página Meu pedido a pílula do canto fica preenchida em rosa, para não se confundir com a barra de categorias */
+.cart-link[aria-current=page],.cart-link[aria-current=page]:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.cart-link[aria-current=page] .cart-link-n{background:#fff;color:var(--accent)}
+[data-theme=dark] .cart-link[aria-current=page],[data-theme=dark] .cart-link[aria-current=page]:hover{color:#321820}
+[data-theme=dark] .cart-link[aria-current=page] .cart-link-n{background:#321820;color:var(--accent)}
+/* P21 (04/10/2026): faixa "Preço final" acima de "Adicionar ao pedido" em todos os produtos (valor × quantidade; detalhe embaixo do rótulo) */
+.final-price{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--soft);border:1.5px solid var(--line-strong);border-radius:12px}
+.final-price-text{display:grid;gap:2px;min-width:0}
+.final-price-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.final-price-detail{font-size:11px;color:var(--muted);line-height:1.4}
+.final-price-detail:empty{display:none}
+.final-price-value{font-size:21px;font-weight:700;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.1}
+.final-price.is-open .final-price-value{font-size:13px;font-weight:600;color:var(--muted);white-space:normal;text-align:right}
+@media(max-width:380px){.final-price{padding:11px 12px;gap:10px}.final-price-value{font-size:19px}}
+/* P23 (04/10/2026): área dos itens em cartão rosa claro — vazia (ícone, frase e as três linhas do cardápio) ou com itens em cartões brancos */
+.cart-box{background:var(--soft);border-radius:16px;padding:12px}
+.cart-box .cart-item{background:var(--panel);border-color:transparent;box-shadow:0 2px 8px #9a526812}
+.empty-state{text-align:center;padding:16px 4px 4px;color:var(--muted);font-size:12px;display:grid;gap:6px}
+.empty-icon{width:36px;height:36px;margin:0 auto 2px;color:var(--accent)}
+.empty-state h2{font-size:17px;color:var(--ink);letter-spacing:-.02em}
+.empty-state>p{font-size:12px;color:var(--muted);margin-bottom:10px}
+.empty-state .category-list{text-align:left}
+.cart-box .catalog-row{background:var(--panel);border-color:transparent;box-shadow:0 2px 8px #9a526812;min-height:64px;padding:12px 15px}
+.cart-box .catalog-row:hover{border-color:var(--accent);background:var(--panel)}
+.cart-box .catalog-row strong{font-size:14px}
+[data-theme=dark] .cart-box .cart-item,[data-theme=dark] .cart-box .catalog-row{box-shadow:0 2px 8px #0003}
+/* P24 (04/10/2026): quadro do Pix com a chave, botão Copiar, titular e sinal (checkout, ao marcar Pix; tela final) */
+.pix-box{display:grid;gap:8px;margin-top:4px;padding:12px 14px;background:var(--soft);border:1.5px solid var(--line-strong);border-radius:12px;text-align:left}
+.pix-head{display:flex;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;align-items:baseline}
+.pix-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.pix-sinal{font-size:11px;color:var(--muted)}
+.pix-sinal strong{color:var(--ink);font-size:12px}
+.pix-key-row{display:flex;align-items:stretch;gap:8px}
+.pix-key{flex:1;min-width:0;display:flex;align-items:center;padding:9px 12px;background:var(--panel);border:1px solid var(--line);border-radius:9px;font:600 13px/1.3 Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}
+.pix-copy{display:inline-flex;align-items:center;gap:6px;padding:0 12px;min-height:40px;border-radius:9px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:11px;font-weight:600;white-space:nowrap;transition:background .15s,color .15s,transform .12s}
+.pix-copy svg{width:15px;height:15px}
+.pix-copy:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.pix-copy:active{transform:scale(.97)}
+.pix-copy.copied{background:var(--panel);color:var(--accent)}
+.pix-meta,.pix-note{font-size:11px;color:var(--muted);line-height:1.5}
+.pix-meta{font-weight:500;color:var(--ink)}
+.pay-note{font-size:11px;color:var(--muted);margin-top:2px}
+[data-theme=dark] .pix-copy{color:#321820}
+[data-theme=dark] .pix-copy.copied{color:var(--accent)}
+@media(max-width:520px){.pix-key-row{flex-direction:column}.pix-key{justify-content:center;text-align:center}.pix-copy{justify-content:center;width:100%}}
+@media(max-width:380px){.pix-key{font-size:12px;padding:8px 10px}}

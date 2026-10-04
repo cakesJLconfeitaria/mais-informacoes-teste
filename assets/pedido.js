@@ -14,14 +14,23 @@
    revisão de linguagem) mudaram só os textos gerados aqui: aviso ao adicionar,
    resumo dos adicionais ("Nenhum adicional escolhido" / "Ver opções"), avisos
    de antecedência, mensagens de preenchimento, a primeira linha da mensagem
-   do WhatsApp e os prefixos "Observações da torta:" e "Frase ou desenho:". */
+   do WhatsApp e os prefixos "Observações da torta:" e "Frase ou desenho:".
+   Ainda em 04/10/2026 (P20 a P24): os adicionais passaram a ter preço fechado
+   (entram no preço do item, no total, no sinal e na mensagem; só "Outro sabor"
+   continua a combinar); cada card ganhou a faixa "Preço final" (valor ×
+   quantidade, com o detalhe embaixo); a página do pedido ganhou o cartão rosa
+   da lista ([data-carrinho]) e o quadro do Pix com botão Copiar ([data-pix]),
+   mostrado ao marcar Pix e na tela final; a mensagem leva a chave Pix. O
+   formato dos itens guardados mudou (extras com preco), por isso STORAGE
+   passou de v1 para v2. */
 (function () {
   'use strict';
 
   var WHATSAPP = '5548999442988';
-  var STORAGE = 'cakesjl-pedido-v1';
+  var STORAGE = 'cakesjl-pedido-v2'; // v2 em 04/10/2026: extras com preço fechado
   var PRAZO_NOVOS_H = 24;   // brownies e donuts
   var PRAZO_TORTAS_H = 48;  // tortas, Matilda e Bentô
+  var PIX = { chave: 'cakesjlconfeitaria@gmail.com' }; // titular e banco ficam no HTML do quadro
 
   var CATALOGO = {
     'brownie-cobertura': { nome: 'Brownie com cobertura', preco: 14, grupo: 'novos', opcao: 'Cobertura' },
@@ -62,6 +71,7 @@
     try { localStorage.setItem(STORAGE, JSON.stringify(itens)); } catch (_) {}
     atualizarContadores(itens);
   }
+  function somaExtras(extras) { return (extras || []).reduce(function (t, e) { return t + (e.preco || 0); }, 0); }
   function totalQtd(itens) { return itens.reduce(function (n, i) { return n + i.qtd; }, 0); }
   function temTortas(itens) { return itens.some(function (i) { return CATALOGO[i.tipo] && CATALOGO[i.tipo].grupo === 'tortas'; }); }
   function prazoHoras(itens) { return temTortas(itens) ? PRAZO_TORTAS_H : PRAZO_NOVOS_H; }
@@ -141,9 +151,11 @@
       }
       item.nome = 'Torta ' + TORTA.tamanhos[tam];
       item.detalhes.push(saborT + (linha ? ' (' + linha + ')' : ''));
+      // adicionais com preço fechado (04/10/2026): somam no preço de cada torta
       (form._adicionais || []).forEach(function (a) {
-        item.extras.push({ nome: a.nome, aPartir: a.aPartir });
+        item.extras.push({ nome: a.nome, preco: a.preco });
       });
+      if (item.preco != null) item.preco += somaExtras(item.extras);
       var deco = form.querySelector('[name=decoracao]').value.trim();
       if (deco) item.obs = 'Observações da torta: ' + deco;
     }
@@ -168,7 +180,8 @@
     var painel = document.querySelector('.panel');
     var formAtivo = null, origem = null;
     var menor = caixas.reduce(function (m, c) { var p = parseFloat(c.dataset.preco); return isNaN(p) ? m : Math.min(m, p); }, Infinity);
-    var dica = 'Veja as ' + caixas.length + ' opções com foto' + (isFinite(menor) ? ', a partir de ' + moeda(menor).replace(' ', '\u00a0') : '');
+    var maior = caixas.reduce(function (m, c) { var p = parseFloat(c.dataset.preco); return isNaN(p) ? m : Math.max(m, p); }, -Infinity);
+    var dica = 'Veja as ' + caixas.length + ' opções com foto' + (isFinite(menor) && isFinite(maior) ? ', de ' + moeda(menor).replace(' ', '\u00a0') + ' a ' + moeda(maior).replace(' ', '\u00a0') : '');
 
     document.body.appendChild(picker);
     picker.classList.add('enhanced');
@@ -183,7 +196,7 @@
       });
     }
     function escolhidos() {
-      return caixas.filter(function (c) { return c.checked; }).map(function (c) { return { nome: c.value, aPartir: parseFloat(c.dataset.preco) }; });
+      return caixas.filter(function (c) { return c.checked; }).map(function (c) { return { nome: c.value, preco: parseFloat(c.dataset.preco) }; });
     }
     function atualizarConcluir() {
       var n = caixas.filter(function (c) { return c.checked; }).length;
@@ -196,7 +209,7 @@
       var botao = form.querySelector('[data-addons-open]');
       if (!el) return;
       if (lista.length) {
-        el.innerHTML = '<strong>' + lista.length + (lista.length === 1 ? ' escolhido' : ' escolhidos') + '</strong><small>' +
+        el.innerHTML = '<strong>' + lista.length + (lista.length === 1 ? ' escolhido' : ' escolhidos') + ' · + ' + moeda(somaExtras(lista)).replace(' ', '\u00a0') + '</strong><small>' +
           escapar(lista.map(function (a) { return a.nome; }).join(', ')) + '</small>';
         if (acao) acao.textContent = 'Alterar';
       } else {
@@ -204,6 +217,7 @@
         if (acao) acao.textContent = 'Ver opções';
       }
       if (botao) botao.classList.toggle('has-addons', lista.length > 0);
+      if (form._atualizarPrevia) form._atualizarPrevia();
     }
     function abrir(form, botao) {
       formAtivo = form; origem = botao;
@@ -257,37 +271,76 @@
       resumo(form);
     });
   }
+  /* Faixa "Preço final" (04/10/2026): valor unitário × quantidade e uma linha de
+     detalhe ("2× tamanho M · 2 adicionais"). unit == null mostra "Valor a combinar". */
+  function mostrarPrevia(form, unit, detalhe) {
+    var el = form.querySelector('[data-previa]');
+    if (!el) return;
+    var valor = el.querySelector('[data-previa-valor]');
+    var det = el.querySelector('[data-previa-detalhe]');
+    var q = lerQtd(form);
+    var prefixo = q > 1 ? q + '× ' : '';
+    if (unit == null) {
+      el.classList.add('is-open');
+      if (valor) valor.textContent = 'Valor a combinar';
+    } else {
+      el.classList.remove('is-open');
+      if (valor) valor.textContent = moeda(unit * q);
+    }
+    if (det) det.textContent = prefixo + (detalhe || '');
+  }
+  function textoAdicionais(lista) {
+    if (!lista || !lista.length) return '';
+    return ' · ' + lista.length + (lista.length === 1 ? ' adicional' : ' adicionais') + ' (+ ' + moeda(somaExtras(lista)) + ')';
+  }
   function ligarFormulario(form) {
     var qtd = form.querySelector('[name=qtd]');
-    form.querySelectorAll('[data-menos]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.max(1, (parseInt(qtd.value, 10) || 1) - 1); }); });
-    form.querySelectorAll('[data-mais]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.min(99, (parseInt(qtd.value, 10) || 1) + 1); }); });
-    if (form.dataset.produto === 'torta') {
-      // tamanho e sabor por botões; a prévia mostra o valor do tamanho escolhido (ou "a combinar" no card de outro sabor)
+    var tipo = form.dataset.produto;
+    var aoMudarQtd = function () { if (form._atualizarPrevia) form._atualizarPrevia(); };
+    form.querySelectorAll('[data-menos]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.max(1, (parseInt(qtd.value, 10) || 1) - 1); aoMudarQtd(); }); });
+    form.querySelectorAll('[data-mais]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.min(99, (parseInt(qtd.value, 10) || 1) + 1); aoMudarQtd(); }); });
+    qtd.addEventListener('input', aoMudarQtd);
+    qtd.addEventListener('change', aoMudarQtd);
+    if (tipo === 'brownie-cobertura' || tipo === 'marmitinha' || tipo === 'donuts') {
+      form._atualizarPrevia = function () {
+        var s = form.querySelector('[name=sabor]:checked');
+        mostrarPrevia(form, CATALOGO[tipo].preco, s ? CATALOGO[tipo].opcao + ': ' + s.value : '');
+      };
+      form.querySelectorAll('[name=sabor]').forEach(function (r) { r.addEventListener('change', form._atualizarPrevia); });
+      form._atualizarPrevia();
+    }
+    if (tipo === 'matilda') {
+      form._atualizarPrevia = function () { mostrarPrevia(form, CATALOGO.matilda.preco, 'Tamanho M · aro 20'); };
+      form._atualizarPrevia();
+    }
+    if (tipo === 'torta') {
+      // tamanho e sabor por botões; a faixa mostra tamanho × quantidade mais os adicionais (ou "a combinar" no card de outro sabor)
       var linhaT = form.dataset.linha || '';
       var campoMorangos = form.querySelector('[data-campo=morangos]');
-      var atualizar = function () {
+      form._atualizarPrevia = function () {
         var sabor = form.querySelector('[name=sabor]:checked');
         var tam = form.querySelector('[name=tamanho]:checked');
         if (campoMorangos) campoMorangos.hidden = !(sabor && sabor.value === 'Morangos');
-        var previa = form.querySelector('[data-previa]');
-        if (!previa) return;
-        if (!linhaT || !TORTA.linhas[linhaT]) previa.textContent = 'Valor a combinar';
-        else previa.textContent = tam ? moeda(TORTA.linhas[linhaT][tam.value]) + ' · tamanho ' + tam.value : '';
+        var extras = form._adicionais || [];
+        var detalhe = (tam ? 'tamanho ' + tam.value : '') + textoAdicionais(extras);
+        if (!linhaT || !TORTA.linhas[linhaT] || !tam) mostrarPrevia(form, null, detalhe);
+        else mostrarPrevia(form, TORTA.linhas[linhaT][tam.value] + somaExtras(extras), detalhe);
       };
-      form.querySelectorAll('[name=tamanho],[name=sabor]').forEach(function (r) { r.addEventListener('change', atualizar); });
-      atualizar();
+      form.querySelectorAll('[name=tamanho],[name=sabor]').forEach(function (r) { r.addEventListener('change', form._atualizarPrevia); });
+      form._atualizarPrevia();
       var botaoAdicionais = form.querySelector('[data-addons-open]');
       if (botaoAdicionais) botaoAdicionais.addEventListener('click', function () { if (abrirAdicionais) abrirAdicionais(form, botaoAdicionais); });
     }
-    if (form.dataset.produto === 'bento') {
-      var previaB = form.querySelector('[data-previa]');
-      var atualizarB = function () {
+    if (tipo === 'bento') {
+      form._atualizarPrevia = function () {
         var op = form.querySelector('[name=opcao]:checked');
         var sb = form.querySelector('[name=sabor]:checked');
-        if (previaB && op) previaB.textContent = moeda(BENTO[op.value].preco + (sb && sb.value === 'Ninho com geleia de morango' ? BENTO.geleia : 0));
+        if (!op) return;
+        var geleia = sb && sb.value === 'Ninho com geleia de morango';
+        mostrarPrevia(form, BENTO[op.value].preco + (geleia ? BENTO.geleia : 0), (op.value === 'flork' ? 'Flork' : 'Laços') + (sb ? ' · ' + sb.value : ''));
       };
-      form.querySelectorAll('[name=opcao],[name=sabor]').forEach(function (el) { el.addEventListener('change', atualizarB); });
-      atualizarB();
+      form.querySelectorAll('[name=opcao],[name=sabor]').forEach(function (el) { el.addEventListener('change', form._atualizarPrevia); });
+      form._atualizarPrevia();
     }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -319,17 +372,16 @@
     var total = 0, aCombinar = false;
     itens.forEach(function (i, k) {
       linhas.push((k + 1) + ') ' + linhaItem(i));
-      if (i.extras.length) linhas.push('   Adicionais: ' + i.extras.map(function (e) { return e.nome + ' (a partir de ' + moeda(e.aPartir) + ')'; }).join('; '));
+      if (i.extras.length) linhas.push('   Adicionais: ' + i.extras.map(function (e) { return e.nome + ' (' + moeda(e.preco) + ')'; }).join('; '));
       if (i.obs) linhas.push('   ' + i.obs);
       if (i.preco == null) aCombinar = true; else total += i.preco * i.qtd;
-      if (i.extras.length) aCombinar = true;
     });
     linhas.push('');
-    linhas.push('Total dos itens: ' + moeda(total) + (aCombinar ? ' (adicionais e itens a combinar fora do total)' : ''));
+    linhas.push('Total dos itens: ' + moeda(total) + (aCombinar ? ' (itens a combinar fora do total)' : ''));
     linhas.push('Sinal de 50%: ' + moeda(total / 2) + (aCombinar ? ' (sobre os itens com valor fechado)' : ''));
     linhas.push('');
     linhas.push('Retirada desejada: ' + dados.data + (dados.hora ? ', ' + dados.hora : '') + ' (a confirmar)');
-    linhas.push('Pagamento: ' + dados.pagamento);
+    linhas.push('Pagamento: ' + dados.pagamento + (dados.pagamento === 'Pix' ? ' (chave: ' + PIX.chave + ')' : ''));
     if (dados.obs) linhas.push('Observações: ' + dados.obs);
     return linhas.join('\n');
   }
@@ -339,6 +391,7 @@
   }
   function iniciarCheckout() {
     var lista = document.querySelector('[data-lista]');
+    var caixa = document.querySelector('[data-carrinho]');
     var vazio = document.querySelector('[data-vazio]');
     var resumo = document.querySelector('[data-resumo]');
     var form = document.querySelector('[data-checkout]');
@@ -362,6 +415,7 @@
       var itens = lerPedido();
       lista.innerHTML = '';
       var temItens = itens.length > 0;
+      if (caixa) caixa.hidden = false;
       vazio.hidden = temItens; form.hidden = !temItens; resumo.hidden = !temItens; lista.hidden = !temItens;
       if (!temItens) { atualizarContadores(itens); return; }
       var total = 0, aCombinar = false;
@@ -369,12 +423,12 @@
         var li = document.createElement('li');
         li.className = 'cart-item';
         var sub = i.preco == null ? 'a combinar' : moeda(i.preco * i.qtd);
-        if (i.preco == null || i.extras.length) aCombinar = true;
+        if (i.preco == null) aCombinar = true;
         if (i.preco != null) total += i.preco * i.qtd;
         li.innerHTML =
           '<div class="cart-item-main"><strong>' + escapar(i.nome) + '</strong>' +
           (i.detalhes.length ? '<span>' + escapar(i.detalhes.join(' · ')) + '</span>' : '') +
-          (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) { return e.nome; }).join(', ')) + ' (valor a combinar)</span>' : '') +
+          (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) { return e.nome + ' (' + moeda(e.preco) + ')'; }).join(', ')) + '</span>' : '') +
           (i.obs ? '<span>' + escapar(i.obs) + '</span>' : '') + '</div>' +
           '<div class="cart-item-side"><div class="qty"><button type="button" data-menos aria-label="Diminuir quantidade">−</button><input type="number" name="qtd" min="1" max="99" inputmode="numeric" value="' + i.qtd + '" aria-label="Quantidade"><button type="button" data-mais aria-label="Aumentar quantidade">+</button></div>' +
           '<strong class="cart-item-sub">' + sub + '</strong><button type="button" class="cart-remove" data-remover>Remover</button></div>';
@@ -390,6 +444,7 @@
       });
       resumo.querySelector('[data-total]').textContent = moeda(total);
       resumo.querySelector('[data-sinal]').textContent = moeda(total / 2);
+      document.querySelectorAll('[data-pix-sinal]').forEach(function (el) { el.textContent = moeda(total / 2); });
       resumo.querySelector('[data-combinar]').hidden = !aCombinar;
       var h = prazoHoras(itens);
       prazoEl.textContent = h === PRAZO_TORTAS_H
@@ -407,6 +462,17 @@
     }
     dataEl.addEventListener('change', conferirData);
     horaEl.addEventListener('change', conferirData);
+    // Pix (04/10/2026): ao marcar Pix aparece o quadro com a chave e o botão Copiar; com cartão, só a nota do link
+    var pixCheckout = form.querySelector('[data-pix]');
+    var cartaoNota = form.querySelector('[data-cartao-nota]');
+    function atualizarPagamento() {
+      var pag = form.querySelector('[name=pagamento]:checked');
+      var ehPix = !!pag && pag.value === 'Pix';
+      if (pixCheckout) pixCheckout.hidden = !ehPix;
+      if (cartaoNota) cartaoNota.hidden = ehPix;
+    }
+    form.querySelectorAll('[name=pagamento]').forEach(function (r) { r.addEventListener('change', atualizarPagamento); });
+    atualizarPagamento();
     nomeEl.addEventListener('input', function () { if (nomeEl.value.trim().length >= 2) mostrarErro('nome', ''); });
     dataEl.addEventListener('input', function () { if (dataEl.value) mostrarErro('data', ''); });
     horaEl.addEventListener('input', function () { if (horaEl.value) mostrarErro('hora', ''); });
@@ -442,8 +508,11 @@
       window.open(url, '_blank', 'noopener');
       // agradecimento: esconde lista e formulário; o pedido continua guardado para reenvio
       lista.hidden = true; resumo.hidden = true; form.hidden = true;
+      if (caixa) caixa.hidden = true;
       if (obrigado) {
         obrigado.hidden = false;
+        var pixObrigado = obrigado.querySelector('[data-pix]');
+        if (pixObrigado) pixObrigado.hidden = dados.pagamento !== 'Pix';
         var nomeSpan = obrigado.querySelector('[data-obrigado-nome]');
         if (nomeSpan) nomeSpan.textContent = nome;
         obrigado.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -454,6 +523,7 @@
       var editar = obrigado.querySelector('[data-editar]');
       if (editar) editar.addEventListener('click', function () {
         obrigado.hidden = true; lista.hidden = false; resumo.hidden = false; form.hidden = false;
+        if (caixa) caixa.hidden = false;
         lista.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
       var novo = obrigado.querySelector('[data-novo]');
@@ -469,8 +539,37 @@
     render();
   }
 
+  /* Botão "Copiar" da chave Pix (04/10/2026): copia, mostra "Copiado!" por um instante e avisa no toast. */
+  function copiarFallback(texto) {
+    var ta = document.createElement('textarea');
+    ta.value = texto; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (_) {}
+    document.body.removeChild(ta);
+  }
+  function ligarCopiar() {
+    document.querySelectorAll('[data-copiar]').forEach(function (b) {
+      var rotulo = b.querySelector('[data-copiar-texto]');
+      var original = rotulo ? rotulo.textContent : '';
+      var timer = 0;
+      b.addEventListener('click', function () {
+        var texto = b.dataset.copiar;
+        var feito = function () {
+          if (rotulo) rotulo.textContent = 'Copiado!';
+          b.classList.add('copied');
+          toast('Chave Pix copiada.');
+          clearTimeout(timer);
+          timer = setTimeout(function () { if (rotulo) rotulo.textContent = original; b.classList.remove('copied'); }, 1800);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(feito, function () { copiarFallback(texto); feito(); });
+        else { copiarFallback(texto); feito(); }
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     montarFab();
+    ligarCopiar();
     iniciarAdicionais();
     document.querySelectorAll('form[data-produto]').forEach(ligarFormulario);
     if (document.querySelector('[data-checkout]')) iniciarCheckout();
