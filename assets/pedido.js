@@ -10,7 +10,11 @@
    (data-linha="Clássicos" | "Especiais" | "Premium"; vazio = outro sabor, a
    combinar), tamanho e sabor por botões, e os adicionais escolhidos num popup
    compartilhado ([data-addons-picker]); o Bentô escolhe opção e sabor por
-   botões. A mensagem do WhatsApp não mudou de formato. */
+   botões. A mensagem do WhatsApp não mudou de formato. Em 04/10/2026 (P19,
+   revisão de linguagem) mudaram só os textos gerados aqui: aviso ao adicionar,
+   resumo dos adicionais ("Nenhum adicional escolhido" / "Ver opções"), avisos
+   de antecedência, mensagens de preenchimento, a primeira linha da mensagem
+   do WhatsApp e os prefixos "Observações da torta:" e "Frase ou desenho:". */
 (function () {
   'use strict';
 
@@ -116,7 +120,7 @@
       item.detalhes.push(BENTO[op].nome);
       item.detalhes.push('Sabor: ' + sabor + (sabor === 'Ninho com geleia de morango' ? ' (+ ' + moeda(BENTO.geleia) + ')' : ''));
       var escrita = form.querySelector('[name=escrita]').value.trim();
-      if (escrita) item.detalhes.push('Escrita/decoração: ' + escrita);
+      if (escrita) item.detalhes.push('Frase ou desenho: ' + escrita);
     } else if (tipo === 'torta') {
       // um formulário por linha: data-linha diz a linha (Clássicos, Especiais, Premium); vazio é "outro sabor", a combinar
       var tam = form.querySelector('[name=tamanho]:checked').value;
@@ -141,7 +145,7 @@
         item.extras.push({ nome: a.nome, aPartir: a.aPartir });
       });
       var deco = form.querySelector('[name=decoracao]').value.trim();
-      if (deco) item.obs = 'Decoração: ' + deco;
+      if (deco) item.obs = 'Observações da torta: ' + deco;
     }
     return item;
   }
@@ -164,7 +168,7 @@
     var painel = document.querySelector('.panel');
     var formAtivo = null, origem = null;
     var menor = caixas.reduce(function (m, c) { var p = parseFloat(c.dataset.preco); return isNaN(p) ? m : Math.min(m, p); }, Infinity);
-    var dica = caixas.length + ' opções com foto' + (isFinite(menor) ? ', valores a partir de ' + moeda(menor) : '');
+    var dica = 'Veja as ' + caixas.length + ' opções com foto' + (isFinite(menor) ? ', a partir de ' + moeda(menor).replace(' ', '\u00a0') : '');
 
     document.body.appendChild(picker);
     picker.classList.add('enhanced');
@@ -196,8 +200,8 @@
           escapar(lista.map(function (a) { return a.nome; }).join(', ')) + '</small>';
         if (acao) acao.textContent = 'Alterar';
       } else {
-        el.innerHTML = '<strong>Nenhum adicional</strong><small>' + escapar(dica) + '</small>';
-        if (acao) acao.textContent = 'Escolher';
+        el.innerHTML = '<strong>Nenhum adicional escolhido</strong><small>' + escapar(dica) + '</small>';
+        if (acao) acao.textContent = 'Ver opções';
       }
       if (botao) botao.classList.toggle('has-addons', lista.length > 0);
     }
@@ -291,7 +295,7 @@
       var itens = lerPedido();
       itens.push(item);
       gravarPedido(itens);
-      toast(item.qtd + '× ' + item.nome + ' no seu pedido');
+      toast('Adicionado ao seu pedido: ' + item.qtd + '× ' + item.nome);
       var fab = document.querySelector('.cart-fab');
       if (fab) { fab.classList.add('pulse'); setTimeout(function () { fab.classList.remove('pulse'); }, 700); }
       // a pílula "Meu pedido" do canto pulsa ao receber um item (04/10/2026)
@@ -311,7 +315,7 @@
     return s;
   }
   function textoMensagem(itens, dados) {
-    var linhas = ['Olá! Quero fazer um pedido pelo site da Cakes JL.', 'Nome: ' + dados.nome, '', 'Pedido:'];
+    var linhas = ['Olá! Montei meu pedido no site da Cakes JL e gostaria de confirmar os detalhes.', 'Nome: ' + dados.nome, '', 'Pedido:'];
     var total = 0, aCombinar = false;
     itens.forEach(function (i, k) {
       linhas.push((k + 1) + ') ' + linhaItem(i));
@@ -370,7 +374,7 @@
         li.innerHTML =
           '<div class="cart-item-main"><strong>' + escapar(i.nome) + '</strong>' +
           (i.detalhes.length ? '<span>' + escapar(i.detalhes.join(' · ')) + '</span>' : '') +
-          (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) { return e.nome; }).join(', ')) + ' (a partir de, a combinar)</span>' : '') +
+          (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) { return e.nome; }).join(', ')) + ' (valor a combinar)</span>' : '') +
           (i.obs ? '<span>' + escapar(i.obs) + '</span>' : '') + '</div>' +
           '<div class="cart-item-side"><div class="qty"><button type="button" data-menos aria-label="Diminuir quantidade">−</button><input type="number" name="qtd" min="1" max="99" inputmode="numeric" value="' + i.qtd + '" aria-label="Quantidade"><button type="button" data-mais aria-label="Aumentar quantidade">+</button></div>' +
           '<strong class="cart-item-sub">' + sub + '</strong><button type="button" class="cart-remove" data-remover>Remover</button></div>';
@@ -389,8 +393,8 @@
       resumo.querySelector('[data-combinar]').hidden = !aCombinar;
       var h = prazoHoras(itens);
       prazoEl.textContent = h === PRAZO_TORTAS_H
-        ? 'Seu pedido tem torta, Matilda ou Bentô: a antecedência mínima é de 48 horas.'
-        : 'Brownies e donuts: antecedência mínima de 24 horas.';
+        ? 'Seu pedido inclui torta, Matilda ou Bentô Cake. Pedimos pelo menos 48 horas de antecedência.'
+        : 'Para brownies e donuts, pedimos pelo menos 24 horas de antecedência.';
       conferirData();
       atualizarContadores(itens);
     }
@@ -418,9 +422,9 @@
         mostrarErro(campo, valido ? '' : msg);
         if (!valido && !primeiroErro) primeiroErro = el;
       }
-      exigir('nome', nomeEl, nome.length >= 2, 'Informe seu nome para enviar o pedido.');
-      exigir('data', dataEl, !!dataEl.value, 'Escolha a data de retirada desejada.');
-      exigir('hora', horaEl, !!horaEl.value, 'Informe o horário de retirada desejado.');
+      exigir('nome', nomeEl, nome.length >= 2, 'Informe seu nome para continuar.');
+      exigir('data', dataEl, !!dataEl.value, 'Escolha o dia em que gostaria de retirar.');
+      exigir('hora', horaEl, !!horaEl.value, 'Informe o horário em que gostaria de retirar.');
       if (primeiroErro) { primeiroErro.focus(); return; }
       var pag = form.querySelector('[name=pagamento]:checked');
       var dados = {
