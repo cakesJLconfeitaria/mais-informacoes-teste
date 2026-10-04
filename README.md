@@ -6,10 +6,10 @@ Site estático em português brasileiro, preparado para GitHub Pages no domínio
 
 - `index.html`: catálogo com três categorias; a fileira de ícones (Instagram, TikTok e Facebook) fica abaixo da cidade. Nas demais páginas, os ícones ficam no rodapé. Abaixo das categorias, uma linha orienta que o pedido é feito pelo site e um botão secundário de WhatsApp ("Precisa de ajuda? Fale com a gente") serve só para dúvidas.
 - `pedido/index.html`: página "Meu pedido" — carrinho e envio do pedido completo pelo WhatsApp.
-- Em todas as páginas, o botão "Meu pedido" (`a.cart-link`) fica no canto superior direito, ao lado do botão de tema; com itens no pedido, mostra a quantidade. Nas páginas internas, o menu de categorias (`nav.category-nav`) tem só os três botões das categorias: lado a lado quando cabem, um abaixo do outro quando não cabem (a largura mínima da linha é `--nav-row-min`, em `site.css`).
+- Em todas as páginas, o botão "Meu pedido" (`a.cart-link`) fica no canto superior direito, ao lado do botão de tema; com itens no pedido, mostra a quantidade. Nas páginas internas, o menu de categorias (`nav.category-nav`) é uma barra segmentada: as três categorias (Tortas e bolos, Brownies, Donuts) dividem uma única barra rosa clara em três partes iguais, sempre na mesma linha, e a categoria atual fica em destaque claro; um nome que não caiba quebra em duas linhas dentro da própria parte.
 - `tortas/index.html`: um card por linha de tortas (Clássicos, Especiais e Premium) com os tamanhos P/M/G selecionáveis (aro, fatias, peso e preço), os sabores em botões, o popup de adicionais e decoração (12 opções com foto), observações, quantidade e "Adicionar ao pedido"; um card "Outro sabor ou combinação" (valor a combinar); Matilda e Bentô Cake (opções e sabores em botões); e as condições em "Como encomendar". Sem menu de seções.
 - `brownies/index.html`: brownie com cobertura e marmitinha brownie recheada.
-- `donuts/index.html`: donuts no copinho, seis unidades e recheio na tampa.
+- `donuts/index.html`: categoria "Donuts"; por enquanto um produto, donuts no copinho (seis unidades e recheio na tampa). Novos tipos de donuts entram como novos cards nesta página.
 - `assets/`: estilos (`site.css`), tema claro/escuro e popup de foto (`site.js`), carrinho e checkout (`pedido.js`) e o ícone do site (favicon).
 - Fotos dos produtos: mantidas nas respectivas pastas `tortas/`, `brownies/` e `donuts/`.
 
