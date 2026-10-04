@@ -1,7 +1,9 @@
 /* Pedido pelo site — carrinho local e checkout único pelo WhatsApp.
    Sem backend: o pedido fica no navegador do cliente (localStorage) e vira
    uma mensagem de WhatsApp. Preços aqui devem bater com os das páginas e
-   com Precificacao-produtos.xlsx. Criado em 03/10/2026. */
+   com Precificacao-produtos.xlsx. Criado em 03/10/2026; em 03/10/2026 o sabor
+   dos produtos novos passou a ser escolhido por botões (chocolate 50% cacau,
+   Ninho ou casadinho), sem acréscimo. */
 (function () {
   'use strict';
 
@@ -90,7 +92,9 @@
     var base = CATALOGO[tipo];
     var item = { uid: uid(), tipo: tipo, nome: base.nome, qtd: lerQtd(form), preco: base.preco, detalhes: [], extras: [], obs: '' };
     if (tipo === 'brownie-cobertura' || tipo === 'marmitinha' || tipo === 'donuts') {
-      item.detalhes.push(base.opcao + ': ' + form.querySelector('[name=sabor]').value);
+      // sabor escolhido por botões (radio); casadinho = chocolate + Ninho, mesmo preço
+      var saborEscolhido = form.querySelector('[name=sabor]:checked');
+      item.detalhes.push(base.opcao + ': ' + (saborEscolhido ? saborEscolhido.value : ''));
     } else if (tipo === 'bento') {
       var op = form.querySelector('[name=opcao]:checked').value;
       var sabor = form.querySelector('[name=sabor]').value;

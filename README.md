@@ -4,23 +4,23 @@ Site estático em português brasileiro, preparado para GitHub Pages no domínio
 
 ## Páginas
 
-- `index.html`: catálogo com três categorias.
+- `index.html`: catálogo com três categorias; a fileira de ícones (Instagram, TikTok e Facebook) fica abaixo da cidade. Nas demais páginas, os ícones ficam no rodapé.
 - `pedido/index.html`: página "Meu pedido" — carrinho e envio do pedido completo pelo WhatsApp.
 - `tortas/index.html`: sabores, tamanhos, preços, Matilda, Bentô Cake, adicionais e condições de tortas, com fotos de Matilda, Bentô e dos adicionais.
 - `brownies/index.html`: brownie com cobertura e marmitinha brownie recheada.
 - `donuts/index.html`: donuts no copinho, seis unidades e recheio na tampa.
-- `assets/`: estilos (`site.css`), tema e carrosséis (`site.js`), carrinho e checkout (`pedido.js`) e o ícone do site (favicon).
+- `assets/`: estilos (`site.css`), tema claro/escuro e popup de foto (`site.js`), carrinho e checkout (`pedido.js`) e o ícone do site (favicon).
 - Fotos dos produtos: mantidas nas respectivas pastas `tortas/`, `brownies/` e `donuts/`.
 
 Todos os produtos são sob encomenda. Os produtos novos mostram o preço por unidade, copinho ou marmitinha, e todos podem ser adicionados ao pedido. O atendimento é pelo WhatsApp (48) 99944-2988.
 
 ## Manutenção
 
-Não há instalação de pacotes, compilação, banco de dados ou backend. Os HTMLs são editáveis diretamente e compartilham `assets/site.css`, `assets/site.js` e `assets/pedido.js`. Conteúdo, preços, links e fotos funcionam sem JavaScript; o tema claro/escuro, os carrosséis e o pedido pelo site dependem dele. Sem JavaScript, cada produto mostra um botão simples de WhatsApp e as fotos continuam disponíveis por rolagem horizontal.
+Não há instalação de pacotes, compilação, banco de dados ou backend. Os HTMLs são editáveis diretamente e compartilham `assets/site.css`, `assets/site.js` e `assets/pedido.js`. Conteúdo, preços, links e fotos funcionam sem JavaScript; o tema claro/escuro, o popup de foto e o pedido pelo site dependem dele. Sem JavaScript, cada produto mostra um botão simples de WhatsApp e cada miniatura é um link que abre a própria imagem.
 
 Pedido pelo site: o cliente adiciona produtos ao pedido (brownies, donuts, tortas com tamanho/sabor/adicionais/decoração, Matilda e Bentô), e em `pedido/` informa nome, data e horário de retirada, forma de pagamento e observações; o botão abre o WhatsApp com a mensagem completa (itens, total, sinal de 50%, retirada e pagamento). O pedido fica só no navegador do cliente (localStorage); nada é enviado ao site. Os preços e as regras (prazos de 24 h e 48 h, sinal de 50%) estão no início de `assets/pedido.js` e precisam acompanhar os textos das páginas.
 
-Fotos do mesmo tipo de produto ficam no mesmo carrossel. Há setas, contador e navegação pelo teclado (setas, Home e End), além de deslize no celular. Não há troca automática. Para adicionar fotos, incluir um novo `figure.gallery-slide` no grupo correto e atualizar os rótulos de posição; a quantidade dos controles é obtida das imagens ao carregar a página. Preservar as imagens fornecidas e os valores comerciais confirmados.
+Cada produto é um card com miniaturas quadradas à esquerda do título (todas visíveis, sem carrossel na página). Tocar em uma miniatura abre a foto grande em um popup, que tem botão de fechar (fecha também com toque fora da foto e com Esc), setas, contador ("2 de 3"), deslize no celular e setas do teclado (também Home e End) para passar entre as fotos do mesmo grupo; não há troca automática e o movimento reduzido do aparelho é respeitado. Abaixo da foto o popup mostra o nome, o valor e uma breve descrição do que está na tela — nos adicionais, que ficam todos no mesmo popup, isso diz qual decoração é cada foto. O grupo é o elemento com `data-photos="Nome"` (e `data-price` com o valor do produto); cada foto é um `a.thumb` com `href` para a imagem e, quando a foto tem nome ou valor próprios (adicionais, opções do Bentô), `data-title`, `data-price` e `data-desc`; sem eles, o popup usa o nome e o valor do grupo e o `alt` da foto como descrição. Para adicionar uma foto, incluir outro `a.thumb` no grupo certo; os controles contam as fotos ao carregar a página. Na página de tortas, a foto da Matilda é miniatura ao lado do título e as fotos do Bentô e dos adicionais, pequenas ao lado do nome, também abrem o popup. Preservar as imagens fornecidas e os valores comerciais confirmados.
 
 Os nomes seguem `produto-tipo.foto.extensão`: o número antes do ponto identifica o tipo e o seguinte identifica a foto. Assim, `brownie-2.*` pertence ao brownie com cobertura e `brownie-3.*` à marmitinha (o tipo 1, brownie recheado, saiu do cardápio). A mesma regra vale para os donuts no copinho e para as fotos de tortas (`matilda-1.1`, `bento-1.1`, `bento-2.1`, `adicional-1.1` a `adicional-12.1`). Manter os nomes e extensões exatos (inclusive maiúsculas/minúsculas) nos links das imagens. Novas fotos precisam ser incluídas no HTML do grupo correspondente.
 
