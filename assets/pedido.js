@@ -301,7 +301,7 @@
      continuam no formulário e guardam a escolha; com JavaScript eles ficam
      escondidos e o card mostra o sabor escolhido num botão que abre este popup
      com a lista (nome e, quando houver, a descrição em <small> no HTML).
-     Tocar num sabor já escolhe; "Escolher ...", X, toque fora e Esc fecham. */
+     Tocar num sabor já escolhe; "Concluir", X, toque fora e Esc fecham. */
   var abrirSabores = null;
   var ICONE_SETA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
   function partesDoSabor(input) {
@@ -336,7 +336,7 @@
       '<div class="addons-box"><header class="addons-head"><div><h2 id="sabores-titulo"></h2><p data-sabores-sub></p></div>' +
       '<button type="button" class="addons-close" data-sabores-fechar aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>' +
       '<div class="flavor-options" role="radiogroup" aria-labelledby="sabores-titulo" data-sabores-lista></div>' +
-      '<footer class="addons-foot"><button type="button" class="button" data-sabores-ok>Escolher</button></footer></div>';
+      '<footer class="addons-foot"><button type="button" class="button" data-sabores-ok>Concluir</button></footer></div>';
     document.body.appendChild(picker);
     var caixa = picker.querySelector('.addons-box');
     var titulo = picker.querySelector('#sabores-titulo');
@@ -347,7 +347,7 @@
     var painel = document.querySelector('.panel');
     var formAtivo = null, origem = null;
 
-    function atualizarOk() { ok.textContent = 'Escolher ' + nomeEscolhido(formAtivo); }
+    function atualizarOk() { ok.textContent = 'Concluir'; }
     function marcarNoForm(nome, valor) {
       var r = formAtivo.querySelector('[name="' + nome + '"][value="' + valor.replace(/"/g, '\\"') + '"]');
       if (!r) return;
