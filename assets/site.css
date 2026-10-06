@@ -254,13 +254,13 @@ html:not(.js) .bento-pick input,html:not(.js) .pick-dot{display:none}
 [data-theme=dark] .pix-copy.copied{color:var(--accent)}
 @media(max-width:520px){.pix-key-row{flex-direction:column}.pix-key{justify-content:center;text-align:center}.pix-copy{justify-content:center;width:100%}}
 @media(max-width:380px){.pix-key{font-size:12px;padding:8px 10px}}
-/* 06/10/2026: carrossel no topo dos cards de brownies, donuts e Matilda — a foto ocupa a largura do card, desliza para o lado (scroll-snap, funciona sem JavaScript) e, com JavaScript, ganha setas e pontos; tocar na foto abre o popup. O preço do topo só aparece sem JavaScript (com ele, está na faixa "Preço final") */
+/* 06/10/2026: carrossel compacto no topo dos cards de brownies, donuts e Matilda — a foto inteira fica centralizada numa área de 200 px (220 px a partir de 600 px), desliza para o lado (scroll-snap, funciona sem JavaScript) e, com JavaScript, ganha setas e pontos; tocar na foto abre o popup maior. O preço do topo só aparece sem JavaScript (com ele, está na faixa "Preço final") */
 html.js .nojs-only{display:none}
 .carousel{position:relative;background:var(--photo)}
 .carousel-track{position:relative;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .carousel-track::-webkit-scrollbar{display:none}
-.slide{flex:0 0 100%;display:block;aspect-ratio:4/5;scroll-snap-align:center;scroll-snap-stop:always;overflow:hidden;cursor:zoom-in;text-decoration:none}
-.slide img{width:100%;height:100%;object-fit:cover}
+.slide{flex:0 0 100%;display:block;height:200px;scroll-snap-align:center;scroll-snap-stop:always;overflow:hidden;cursor:zoom-in;text-decoration:none}
+.slide img{width:100%;height:100%;object-fit:contain}
 .slide:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
 .carousel-arrow{position:absolute;top:50%;margin-top:-18px;width:36px;height:36px;border-radius:50%;border:0;background:#fffffff2;color:var(--accent);display:grid;place-items:center;box-shadow:0 2px 10px #4a1f2d33;transition:opacity .15s,transform .12s}
 .carousel-arrow svg{width:18px;height:18px}
@@ -277,7 +277,7 @@ html.js .nojs-only{display:none}
 .special-card>.carousel{margin:-18px -18px 16px}
 .product-body .consult-price{margin-bottom:0}
 @media(max-width:380px){.special-card>.carousel{margin:-15px -15px 14px}}
-@media(min-width:600px){.slide{aspect-ratio:auto;height:440px}.slide img{object-fit:contain}}
+@media(min-width:600px){.slide{height:220px}}
 /* 06/10/2026: em Meu pedido a quantidade de cada item também fica centralizada e sozinha na linha; embaixo, "Remover" à esquerda e o subtotal à direita */
 .cart-item-side{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 12px}
 .cart-item-side .qty{grid-column:1/-1;grid-row:1;justify-self:center}
