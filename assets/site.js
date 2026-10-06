@@ -1,7 +1,9 @@
 (function () {
   'use strict';
+
   // Marca que há JavaScript: o CSS esconde .js-only quando não há (html:not(.js)); 04/10/2026
   document.documentElement.classList.add('js');
+
   function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
     var meta = document.querySelector('meta[name="theme-color"]');
@@ -13,7 +15,9 @@
     }
   }
   var saved = 'light';
-  try { saved = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'; } catch (_) {}
+  try {
+    saved = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+  } catch (_) {}
   applyTheme(saved);
 
   /* Popup de foto (P11, 03/10/2026). Sem JavaScript, cada miniatura é um link
@@ -23,8 +27,15 @@
      sem troca automática; o foco fica preso no popup e volta à miniatura. */
   function iniciarPopupDeFotos() {
     var grupos = Array.prototype.map.call(document.querySelectorAll('[data-photos]'), function (el) {
-      return { nome: el.dataset.photos, preco: el.dataset.price || '', semDescricao: el.hasAttribute('data-hide-desc'), links: Array.prototype.slice.call(el.querySelectorAll('a.thumb, a.slide')) };
-    }).filter(function (g) { return g.links.length; });
+      return {
+        nome: el.dataset.photos,
+        preco: el.dataset.price || '',
+        semDescricao: el.hasAttribute('data-hide-desc'),
+        links: Array.prototype.slice.call(el.querySelectorAll('a.thumb, a.slide'))
+      };
+    }).filter(function (g) {
+      return g.links.length;
+    });
     if (!grupos.length) return;
 
     var ICONE_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
@@ -68,10 +79,21 @@
       var img = link.querySelector('img');
       var alt = img ? img.alt : '';
       var nome = link.dataset.title || g.nome;
-      return { src: link.getAttribute('href'), alt: alt, chapeu: nome === g.nome ? '' : g.nome, titulo: nome,
-        preco: link.dataset.price || g.preco, descricao: g.semDescricao ? '' : (link.dataset.desc || alt) };
+      return {
+        src: link.getAttribute('href'),
+        alt: alt,
+        chapeu: nome === g.nome ? '' : g.nome,
+        titulo: nome,
+        preco: link.dataset.price || g.preco,
+        descricao: g.semDescricao ? '' : (link.dataset.desc || alt)
+      };
     }
-    function texto(el, valor) { el.textContent = valor; el.hidden = !valor; }
+
+    function texto(el, valor) {
+      el.textContent = valor;
+      el.hidden = !valor;
+    }
+
     function mostrar(indice) {
       atual = Math.max(0, Math.min(grupo.links.length - 1, indice));
       var foto = dadosDaFoto(grupo, grupo.links[atual]);
@@ -86,7 +108,11 @@
       anterior.disabled = atual === 0;
       proxima.disabled = atual === grupo.links.length - 1;
       popup.setAttribute('aria-label', 'Foto ' + posicao + ' — ' + foto.titulo);
-      leitor.textContent = (grupo.links.length > 1 ? 'Foto ' + posicao + ': ' : '') + foto.titulo + (foto.preco ? ', ' + foto.preco : '') + (foto.descricao && foto.descricao !== foto.titulo ? '. ' + foto.descricao : '');
+      leitor.textContent =
+        (grupo.links.length > 1 ? 'Foto ' + posicao + ': ' : '') +
+        foto.titulo +
+        (foto.preco ? ', ' + foto.preco : '') +
+        (foto.descricao && foto.descricao !== foto.titulo ? '. ' + foto.descricao : '');
       var ativo = document.activeElement; // se a seta usada ficou desabilitada, o foco não pode se perder
       if (!ativo || ativo === document.body || ativo.disabled || !popup.contains(ativo)) fechar.focus();
     }
@@ -138,10 +164,17 @@
       if (popup.hidden) return;
       if (event.key === 'Escape') { event.preventDefault(); encerrar(); return; }
       if (event.key === 'Tab') {
-        var focaveis = [fechar, anterior, proxima].filter(function (b) { return !b.disabled && b.offsetParent !== null; });
+        var focaveis = [fechar, anterior, proxima].filter(function (b) {
+          return !b.disabled && b.offsetParent !== null;
+        });
         var primeiro = focaveis[0], ultimo = focaveis[focaveis.length - 1];
-        if (event.shiftKey && (document.activeElement === primeiro || !popup.contains(document.activeElement))) { event.preventDefault(); ultimo.focus(); }
-        else if (!event.shiftKey && (document.activeElement === ultimo || !popup.contains(document.activeElement))) { event.preventDefault(); primeiro.focus(); }
+        if (event.shiftKey && (document.activeElement === primeiro || !popup.contains(document.activeElement))) {
+          event.preventDefault();
+          ultimo.focus();
+        } else if (!event.shiftKey && (document.activeElement === ultimo || !popup.contains(document.activeElement))) {
+          event.preventDefault();
+          primeiro.focus();
+        }
         return;
       }
       if (event.altKey || event.ctrlKey || event.metaKey) return;
@@ -185,7 +218,10 @@
       if (fotos.length < 2) { carrossel.classList.add('single'); return; }
       function botao(classe, rotulo, icone) {
         var b = document.createElement('button');
-        b.type = 'button'; b.className = 'carousel-arrow ' + classe; b.setAttribute('aria-label', rotulo); b.innerHTML = icone;
+        b.type = 'button';
+        b.className = 'carousel-arrow ' + classe;
+        b.setAttribute('aria-label', rotulo);
+        b.innerHTML = icone;
         carrossel.appendChild(b);
         return b;
       }
@@ -195,7 +231,8 @@
       pontos.className = 'carousel-dots';
       var marcas = fotos.map(function (foto, i) {
         var p = document.createElement('button');
-        p.type = 'button'; p.setAttribute('aria-label', 'Foto ' + (i + 1) + ' de ' + fotos.length);
+        p.type = 'button';
+        p.setAttribute('aria-label', 'Foto ' + (i + 1) + ' de ' + fotos.length);
         p.addEventListener('click', function () { ir(i); });
         pontos.appendChild(p);
         return p;
@@ -205,7 +242,9 @@
       function marcar(i) {
         if (i === atual) return;
         atual = i;
-        marcas.forEach(function (m, k) { m.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+        marcas.forEach(function (m, k) {
+          m.setAttribute('aria-current', k === i ? 'true' : 'false');
+        });
         anterior.disabled = i === 0;
         proxima.disabled = i === fotos.length - 1;
       }
@@ -233,7 +272,9 @@
     if (toggle) toggle.addEventListener('click', function () {
       var theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
       applyTheme(theme);
-      try { localStorage.setItem('theme', theme); } catch (_) {}
+      try {
+        localStorage.setItem('theme', theme);
+      } catch (_) {}
     });
     iniciarCarrosseis();
     iniciarPopupDeFotos();

@@ -75,31 +75,60 @@
     return s.getAttribute('src').replace(/assets\/pedido\.js.*$/, '');
   }
   function lerPedido() {
-    try { var p = JSON.parse(localStorage.getItem(STORAGE) || '[]'); return Array.isArray(p) ? p : []; }
-    catch (_) { return []; }
+    try {
+      var p = JSON.parse(localStorage.getItem(STORAGE) || '[]');
+      return Array.isArray(p) ? p : [];
+    } catch (_) {
+      return [];
+    }
   }
   function gravarPedido(itens) {
-    try { localStorage.setItem(STORAGE, JSON.stringify(itens)); } catch (_) {}
+    try {
+      localStorage.setItem(STORAGE, JSON.stringify(itens));
+    } catch (_) {}
     atualizarContadores(itens);
   }
-  function somaExtras(extras) { return (extras || []).reduce(function (t, e) { return t + (e.preco || 0); }, 0); }
-  function totalQtd(itens) { return itens.reduce(function (n, i) { return n + i.qtd; }, 0); }
-  function temTortas(itens) { return itens.some(function (i) { return CATALOGO[i.tipo] && CATALOGO[i.tipo].grupo === 'tortas'; }); }
-  function prazoHoras(itens) { return temTortas(itens) ? PRAZO_TORTAS_H : PRAZO_NOVOS_H; }
-  function escapar(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function uid() { return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function somaExtras(extras) {
+    return (extras || []).reduce(function (t, e) {
+      return t + (e.preco || 0);
+    }, 0);
+  }
+  function totalQtd(itens) {
+    return itens.reduce(function (n, i) {
+      return n + i.qtd;
+    }, 0);
+  }
+  function temTortas(itens) {
+    return itens.some(function (i) {
+      return CATALOGO[i.tipo] && CATALOGO[i.tipo].grupo === 'tortas';
+    });
+  }
+  function prazoHoras(itens) {
+    return temTortas(itens) ? PRAZO_TORTAS_H : PRAZO_NOVOS_H;
+  }
+  function escapar(t) {
+    return String(t).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function uid() {
+    return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
 
   /* ---------- contador fixo e botão "Meu pedido" do canto ---------- */
   function atualizarContadores(itens) {
     var n = totalQtd(itens || lerPedido());
-    document.querySelectorAll('[data-pedido-contador]').forEach(function (el) { el.textContent = n; });
+    document.querySelectorAll('[data-pedido-contador]').forEach(function (el) {
+      el.textContent = n;
+    });
     var fab = document.querySelector('.cart-fab');
     if (fab) fab.hidden = n === 0 || document.body.classList.contains('pedido-page');
     // .cart-link: pílula do canto superior direito (todas as páginas); o número só aparece com itens
     document.querySelectorAll('.cart-link, .nav-pedido').forEach(function (a) {
       a.classList.toggle('has-items', n > 0);
       a.dataset.n = n;
-      if (a.classList.contains('cart-link')) a.setAttribute('aria-label', 'Meu pedido' + (n > 0 ? ', ' + n + (n === 1 ? ' item' : ' itens') : ', vazio'));
+      if (a.classList.contains('cart-link'))
+        a.setAttribute('aria-label', 'Meu pedido' + (n > 0 ? ', ' + n + (n === 1 ? ' item' : ' itens') : ', vazio'));
     });
   }
   function montarFab() {
@@ -114,9 +143,19 @@
   var toastTimer = 0;
   function toast(msg) {
     var t = document.querySelector('.toast');
-    if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.setAttribute('aria-live', 'polite'); document.body.appendChild(t); }
-    t.textContent = msg; t.classList.add('show');
-    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600);
+    if (!t) {
+      t = document.createElement('div');
+      t.className = 'toast';
+      t.setAttribute('role', 'status');
+      t.setAttribute('aria-live', 'polite');
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      t.classList.remove('show');
+    }, 2600);
   }
 
   /* ---------- formulários de produto ---------- */
@@ -129,7 +168,9 @@
      massa {v}") aparece quando aquele sabor está marcado. */
   function campoDoSabor(form, valor) {
     var achado = null;
-    form.querySelectorAll('[data-campo][data-para]').forEach(function (c) { if (c.dataset.para === valor) achado = c; });
+    form.querySelectorAll('[data-campo][data-para]').forEach(function (c) {
+      if (c.dataset.para === valor) achado = c;
+    });
     return achado;
   }
   function nomeComEscolha(form, valor) {
@@ -140,7 +181,16 @@
   function montarItem(form) {
     var tipo = form.dataset.produto;
     var base = CATALOGO[tipo];
-    var item = { uid: uid(), tipo: tipo, nome: base.nome, qtd: lerQtd(form), preco: base.preco, detalhes: [], extras: [], obs: '' };
+    var item = {
+      uid: uid(),
+      tipo: tipo,
+      nome: base.nome,
+      qtd: lerQtd(form),
+      preco: base.preco,
+      detalhes: [],
+      extras: [],
+      obs: ''
+    };
     if (tipo === 'brownie-cobertura' || tipo === 'marmitinha' || tipo === 'donuts') {
       // sabor escolhido por botões (radio); casadinho = chocolate + Ninho, mesmo preço
       var saborEscolhido = form.querySelector('[name=sabor]:checked');
@@ -152,7 +202,8 @@
       item.nome = 'Bentô Cake (aprox. 300 g)';
       item.preco = BENTO[op].preco + (sabor === 'Ninho com geleia de morango' ? BENTO.geleia : 0);
       item.detalhes.push(BENTO[op].nome);
-      item.detalhes.push('Sabor: ' + sabor + (sabor === 'Ninho com geleia de morango' ? ' (+ ' + moeda(BENTO.geleia) + ')' : ''));
+      item.detalhes.push('Sabor: ' + sabor +
+        (sabor === 'Ninho com geleia de morango' ? ' (+ ' + moeda(BENTO.geleia) + ')' : ''));
       var coberturaB = form.querySelector('[name=cobertura]:checked');
       if (coberturaB) item.detalhes.push('Cobertura: ' + coberturaB.value);
       var escrita = form.querySelector('[name=escrita]').value.trim();
@@ -204,9 +255,18 @@
     var fechar = picker.querySelector('[data-addons-close]');
     var painel = document.querySelector('.panel');
     var formAtivo = null, origem = null;
-    var menor = caixas.reduce(function (m, c) { var p = parseFloat(c.dataset.preco); return isNaN(p) ? m : Math.min(m, p); }, Infinity);
-    var maior = caixas.reduce(function (m, c) { var p = parseFloat(c.dataset.preco); return isNaN(p) ? m : Math.max(m, p); }, -Infinity);
-    var dica = 'Veja as ' + caixas.length + ' opções com foto' + (isFinite(menor) && isFinite(maior) ? ', de ' + moeda(menor).replace(' ', '\u00a0') + ' a ' + moeda(maior).replace(' ', '\u00a0') : '');
+    var menor = caixas.reduce(function (m, c) {
+      var p = parseFloat(c.dataset.preco);
+      return isNaN(p) ? m : Math.min(m, p);
+    }, Infinity);
+    var maior = caixas.reduce(function (m, c) {
+      var p = parseFloat(c.dataset.preco);
+      return isNaN(p) ? m : Math.max(m, p);
+    }, -Infinity);
+    var dica = 'Veja as ' + caixas.length + ' opções com foto' +
+      (isFinite(menor) && isFinite(maior)
+        ? ', de ' + moeda(menor).replace(' ', '\u00a0') + ' a ' + moeda(maior).replace(' ', '\u00a0')
+        : '');
 
     document.body.appendChild(picker);
     picker.classList.add('enhanced');
@@ -214,17 +274,25 @@
     picker.setAttribute('role', 'dialog');
     picker.setAttribute('aria-modal', 'true');
 
-    function lightboxAberto() { return document.body.classList.contains('lightbox-open'); }
+    function lightboxAberto() {
+      return document.body.classList.contains('lightbox-open');
+    }
     function focaveis() {
       return Array.prototype.filter.call(picker.querySelectorAll('button, a[href], input'), function (el) {
         return !el.disabled && el.offsetParent !== null;
       });
     }
     function escolhidos() {
-      return caixas.filter(function (c) { return c.checked; }).map(function (c) { return { nome: c.value, preco: parseFloat(c.dataset.preco) }; });
+      return caixas.filter(function (c) {
+        return c.checked;
+      }).map(function (c) {
+        return { nome: c.value, preco: parseFloat(c.dataset.preco) };
+      });
     }
     function atualizarConcluir() {
-      var n = caixas.filter(function (c) { return c.checked; }).length;
+      var n = caixas.filter(function (c) {
+        return c.checked;
+      }).length;
       concluir.textContent = n ? 'Concluir (' + n + (n === 1 ? ' escolhido)' : ' escolhidos)') : 'Concluir';
     }
     function resumo(form) {
@@ -234,8 +302,12 @@
       var botao = form.querySelector('[data-addons-open]');
       if (!el) return;
       if (lista.length) {
-        el.innerHTML = '<strong>' + lista.length + (lista.length === 1 ? ' escolhido' : ' escolhidos') + ' · + ' + moeda(somaExtras(lista)).replace(' ', '\u00a0') + '</strong><small>' +
-          escapar(lista.map(function (a) { return a.nome; }).join(', ')) + '</small>';
+        el.innerHTML = '<strong>' + lista.length +
+          (lista.length === 1 ? ' escolhido' : ' escolhidos') +
+          ' · + ' + moeda(somaExtras(lista)).replace(' ', '\u00a0') + '</strong><small>' +
+          escapar(lista.map(function (a) {
+            return a.nome;
+          }).join(', ')) + '</small>';
         if (acao) acao.textContent = 'Alterar';
       } else {
         el.innerHTML = '<strong>Nenhum adicional escolhido</strong><small>' + escapar(dica) + '</small>';
@@ -245,9 +317,14 @@
       if (form._atualizarPrevia) form._atualizarPrevia();
     }
     function abrir(form, botao) {
-      formAtivo = form; origem = botao;
-      var marcados = (form._adicionais || []).map(function (a) { return a.nome; });
-      caixas.forEach(function (c) { c.checked = marcados.indexOf(c.value) > -1; });
+      formAtivo = form;
+      origem = botao;
+      var marcados = (form._adicionais || []).map(function (a) {
+        return a.nome;
+      });
+      caixas.forEach(function (c) {
+        c.checked = marcados.indexOf(c.value) > -1;
+      });
       atualizarConcluir();
       picker.hidden = false;
       caixa.scrollTop = 0;
@@ -258,7 +335,9 @@
     function encerrar(guardar) {
       if (picker.hidden) return;
       if (formAtivo) {
-        if (!guardar) caixas.forEach(function (c) { c.checked = false; });
+        if (!guardar) caixas.forEach(function (c) {
+          c.checked = false;
+        });
         formAtivo._adicionais = escolhidos();
         resumo(formAtivo);
       }
@@ -266,13 +345,18 @@
       document.body.classList.remove('picker-open');
       if (painel && 'inert' in painel) painel.inert = false;
       if (origem) origem.focus();
-      formAtivo = null; origem = null;
+      formAtivo = null;
+      origem = null;
     }
-    caixas.forEach(function (c) { c.addEventListener('change', atualizarConcluir); });
+    caixas.forEach(function (c) {
+      c.addEventListener('change', atualizarConcluir);
+    });
     concluir.addEventListener('click', function () { encerrar(true); });
     nenhum.addEventListener('click', function () { encerrar(false); });
     fechar.addEventListener('click', function () { encerrar(true); });
-    picker.addEventListener('click', function (event) { if (event.target === picker) encerrar(true); });
+    picker.addEventListener('click', function (event) {
+      if (event.target === picker) encerrar(true);
+    });
     document.addEventListener('keydown', function (event) {
       // o popup de foto (site.js) trata o Esc antes e marca o evento; nesse caso só ele fecha
       if (picker.hidden || lightboxAberto() || event.defaultPrevented) return;
@@ -281,8 +365,13 @@
       var lista = focaveis();
       if (!lista.length) return;
       var primeiro = lista[0], ultimo = lista[lista.length - 1];
-      if (event.shiftKey && (document.activeElement === primeiro || !picker.contains(document.activeElement))) { event.preventDefault(); ultimo.focus(); }
-      else if (!event.shiftKey && (document.activeElement === ultimo || !picker.contains(document.activeElement))) { event.preventDefault(); primeiro.focus(); }
+      if (event.shiftKey && (document.activeElement === primeiro || !picker.contains(document.activeElement))) {
+        event.preventDefault();
+        ultimo.focus();
+      } else if (!event.shiftKey && (document.activeElement === ultimo || !picker.contains(document.activeElement))) {
+        event.preventDefault();
+        primeiro.focus();
+      }
     });
     // o popup de foto, ao fechar, libera o painel; com o popup de adicionais ainda aberto, o painel volta a ficar inerte
     document.addEventListener('focusin', function (event) {
@@ -347,7 +436,9 @@
     var painel = document.querySelector('.panel');
     var formAtivo = null, origem = null;
 
-    function atualizarOk() { ok.textContent = 'Concluir'; }
+    function atualizarOk() {
+      ok.textContent = 'Concluir';
+    }
     function marcarNoForm(nome, valor) {
       var r = formAtivo.querySelector('[name="' + nome + '"][value="' + valor.replace(/"/g, '\\"') + '"]');
       if (!r) return;
@@ -380,17 +471,23 @@
           var bloco = document.createElement('div');
           bloco.className = 'flavor-sub';
           bloco.setAttribute('data-sabores-sub', r.value);
-          bloco.innerHTML = '<span class="field-label" id="sabores-sub-' + i + '"></span><div class="choice-grid" role="radiogroup" aria-labelledby="sabores-sub-' + i + '"></div>';
+          bloco.innerHTML =
+            '<span class="field-label" id="sabores-sub-' + i + '"></span><div class="choice-grid" role="radiogroup" aria-labelledby="sabores-sub-' + i + '"></div>';
           bloco.querySelector('.field-label').textContent = rotulo ? rotulo.textContent : '';
           var grade = bloco.querySelector('.choice-grid');
           sub.querySelectorAll('input[name="' + nomeCampo + '"]').forEach(function (c) {
             var l = document.createElement('label');
             l.innerHTML = '<input type="radio"><span></span>';
             var ci = l.querySelector('input');
-            ci.name = nomeCampo + '-popup'; ci.value = c.value; ci.checked = c.checked;
+            ci.name = nomeCampo + '-popup';
+            ci.value = c.value;
+            ci.checked = c.checked;
             var texto = c.parentNode.querySelector('span');
             l.querySelector('span').textContent = texto ? texto.textContent : c.value;
-            ci.addEventListener('change', function () { marcarNoForm(nomeCampo, c.value); atualizarOk(); });
+            ci.addEventListener('change', function () {
+              marcarNoForm(nomeCampo, c.value);
+              atualizarOk();
+            });
             grade.appendChild(l);
           });
           item.appendChild(bloco);
@@ -411,10 +508,13 @@
       });
     }
     function abrir(form, botao) {
-      formAtivo = form; origem = botao;
+      formAtivo = form;
+      origem = botao;
       var nome = form.dataset.linha ? 'Sabores ' + form.dataset.linha : 'Sabores do Bentô Cake';
       titulo.textContent = nome;
-      sub.textContent = form.dataset.produto === 'bento' ? 'Escolha o sabor do seu Bentô Cake.' : 'Escolha o sabor da sua torta.';
+      sub.textContent = form.dataset.produto === 'bento'
+        ? 'Escolha o sabor do seu Bentô Cake.'
+        : 'Escolha o sabor da sua torta.';
       montarLista(form);
       atualizarOk();
       picker.hidden = false;
@@ -431,11 +531,14 @@
       if (painel && 'inert' in painel) painel.inert = false;
       if (formAtivo && formAtivo._resumoSabor) formAtivo._resumoSabor();
       if (origem) origem.focus();
-      formAtivo = null; origem = null;
+      formAtivo = null;
+      origem = null;
     }
     ok.addEventListener('click', encerrar);
     fechar.addEventListener('click', encerrar);
-    picker.addEventListener('click', function (event) { if (event.target === picker) encerrar(); });
+    picker.addEventListener('click', function (event) {
+      if (event.target === picker) encerrar();
+    });
     document.addEventListener('keydown', function (event) {
       if (picker.hidden || event.defaultPrevented) return;
       if (event.key === 'Escape') { event.preventDefault(); encerrar(); return; }
@@ -443,8 +546,13 @@
       var itens = focaveis();
       if (!itens.length) return;
       var primeiro = itens[0], ultimo = itens[itens.length - 1];
-      if (event.shiftKey && (document.activeElement === primeiro || !picker.contains(document.activeElement))) { event.preventDefault(); ultimo.focus(); }
-      else if (!event.shiftKey && (document.activeElement === ultimo || !picker.contains(document.activeElement))) { event.preventDefault(); primeiro.focus(); }
+      if (event.shiftKey && (document.activeElement === primeiro || !picker.contains(document.activeElement))) {
+        event.preventDefault();
+        ultimo.focus();
+      } else if (!event.shiftKey && (document.activeElement === ultimo || !picker.contains(document.activeElement))) {
+        event.preventDefault();
+        primeiro.focus();
+      }
     });
     abrirSabores = abrir;
   }
@@ -456,7 +564,8 @@
     botao.type = 'button';
     botao.className = 'flavor-trigger';
     botao.setAttribute('aria-haspopup', 'dialog');
-    botao.innerHTML = '<span class="flavor-summary"><strong></strong><small></small></span><span class="flavor-action">' + total + ' sabores</span>' + ICONE_SETA;
+    botao.innerHTML =
+      '<span class="flavor-summary"><strong></strong><small></small></span><span class="flavor-action">' + total + ' sabores</span>' + ICONE_SETA;
     var forte = botao.querySelector('strong');
     var detalhe = botao.querySelector('small');
     form._resumoSabor = function () {
@@ -482,7 +591,12 @@
      Chantilly, já marcado; com mais de uma, nada vem marcado e o cliente
      precisa escolher antes de adicionar. No card "Outro sabor", Chantilly ou
      "Recheio (a combinar)". */
-  var ROTULO_COBERTURA = { 'Chantilly': ['Chantilly', ''], 'Chocolate 50% cacau': ['Chocolate', '50% cacau'], 'Ninho': ['Ninho', ''], 'Recheio (a combinar)': ['Recheio', 'combinamos qual'] };
+  var ROTULO_COBERTURA = {
+    'Chantilly': ['Chantilly', ''],
+    'Chocolate 50% cacau': ['Chocolate', '50% cacau'],
+    'Ninho': ['Ninho', ''],
+    'Recheio (a combinar)': ['Recheio', 'combinamos qual']
+  };
   function opcoesDeCobertura(form, campo) {
     if (campo.dataset.coberturaOutro) return ['Chantilly', 'Recheio (a combinar)'];
     var r = form.querySelector('.flavor-field [name=sabor]:checked');
@@ -565,9 +679,21 @@
   function ligarFormulario(form) {
     var qtd = form.querySelector('[name=qtd]');
     var tipo = form.dataset.produto;
-    var aoMudarQtd = function () { if (form._atualizarPrevia) form._atualizarPrevia(); };
-    form.querySelectorAll('[data-menos]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.max(1, (parseInt(qtd.value, 10) || 1) - 1); aoMudarQtd(); }); });
-    form.querySelectorAll('[data-mais]').forEach(function (b) { b.addEventListener('click', function () { qtd.value = Math.min(99, (parseInt(qtd.value, 10) || 1) + 1); aoMudarQtd(); }); });
+    var aoMudarQtd = function () {
+      if (form._atualizarPrevia) form._atualizarPrevia();
+    };
+    form.querySelectorAll('[data-menos]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        qtd.value = Math.max(1, (parseInt(qtd.value, 10) || 1) - 1);
+        aoMudarQtd();
+      });
+    });
+    form.querySelectorAll('[data-mais]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        qtd.value = Math.min(99, (parseInt(qtd.value, 10) || 1) + 1);
+        aoMudarQtd();
+      });
+    });
     qtd.addEventListener('input', aoMudarQtd);
     qtd.addEventListener('change', aoMudarQtd);
     if (tipo === 'brownie-cobertura' || tipo === 'marmitinha' || tipo === 'donuts') {
@@ -575,30 +701,43 @@
         var s = form.querySelector('[name=sabor]:checked');
         mostrarPrevia(form, CATALOGO[tipo].preco, s ? CATALOGO[tipo].opcao + ': ' + s.value : '');
       };
-      form.querySelectorAll('[name=sabor]').forEach(function (r) { r.addEventListener('change', form._atualizarPrevia); });
+      form.querySelectorAll('[name=sabor]').forEach(function (r) {
+        r.addEventListener('change', form._atualizarPrevia);
+      });
       form._atualizarPrevia();
     }
     if (tipo === 'matilda') {
-      form._atualizarPrevia = function () { mostrarPrevia(form, CATALOGO.matilda.preco, 'Tamanho M · aro 20'); };
+      form._atualizarPrevia = function () {
+        mostrarPrevia(form, CATALOGO.matilda.preco, 'Tamanho M · aro 20');
+      };
       form._atualizarPrevia();
     }
-    if (tipo === 'torta' || tipo === 'bento') { ligarSabor(form); ligarCobertura(form); }
+    if (tipo === 'torta' || tipo === 'bento') {
+      ligarSabor(form);
+      ligarCobertura(form);
+    }
     if (tipo === 'torta') {
       // tamanho e sabor por botões; a faixa mostra tamanho × quantidade mais os adicionais (ou "a combinar" no card de outro sabor)
       var linhaT = form.dataset.linha || '';
       form._atualizarPrevia = function () {
         var sabor = form.querySelector('[name=sabor]:checked');
         var tam = form.querySelector('[name=tamanho]:checked');
-        form.querySelectorAll('[data-campo][data-para]').forEach(function (c) { c.hidden = !(sabor && sabor.value === c.dataset.para); });
+        form.querySelectorAll('[data-campo][data-para]').forEach(function (c) {
+          c.hidden = !(sabor && sabor.value === c.dataset.para);
+        });
         var extras = form._adicionais || [];
         var detalhe = (tam ? 'tamanho ' + tam.value : '') + textoAdicionais(extras);
         if (!linhaT || !TORTA.linhas[linhaT] || !tam) mostrarPrevia(form, null, detalhe);
         else mostrarPrevia(form, TORTA.linhas[linhaT][tam.value] + somaExtras(extras), detalhe);
       };
-      form.querySelectorAll('[name=tamanho],[name=sabor]').forEach(function (r) { r.addEventListener('change', form._atualizarPrevia); });
+      form.querySelectorAll('[name=tamanho],[name=sabor]').forEach(function (r) {
+        r.addEventListener('change', form._atualizarPrevia);
+      });
       form._atualizarPrevia();
       var botaoAdicionais = form.querySelector('[data-addons-open]');
-      if (botaoAdicionais) botaoAdicionais.addEventListener('click', function () { if (abrirAdicionais) abrirAdicionais(form, botaoAdicionais); });
+      if (botaoAdicionais) botaoAdicionais.addEventListener('click', function () {
+        if (abrirAdicionais) abrirAdicionais(form, botaoAdicionais);
+      });
     }
     if (tipo === 'bento') {
       form._atualizarPrevia = function () {
@@ -606,9 +745,15 @@
         var sb = form.querySelector('[name=sabor]:checked');
         if (!op) return;
         var geleia = sb && sb.value === 'Ninho com geleia de morango';
-        mostrarPrevia(form, BENTO[op.value].preco + (geleia ? BENTO.geleia : 0), (op.value === 'flork' ? 'Flork' : 'Laços') + (sb ? ' · ' + sb.value : ''));
+        mostrarPrevia(
+          form,
+          BENTO[op.value].preco + (geleia ? BENTO.geleia : 0),
+          (op.value === 'flork' ? 'Flork' : 'Laços') + (sb ? ' · ' + sb.value : '')
+        );
       };
-      form.querySelectorAll('[name=opcao],[name=sabor]').forEach(function (el) { el.addEventListener('change', form._atualizarPrevia); });
+      form.querySelectorAll('[name=opcao],[name=sabor]').forEach(function (el) {
+        el.addEventListener('change', form._atualizarPrevia);
+      });
       form._atualizarPrevia();
     }
     form.addEventListener('submit', function (ev) {
@@ -620,11 +765,20 @@
       gravarPedido(itens);
       toast('Adicionado ao seu pedido: ' + item.qtd + '× ' + item.nome);
       var fab = document.querySelector('.cart-fab');
-      if (fab) { fab.classList.add('pulse'); setTimeout(function () { fab.classList.remove('pulse'); }, 700); }
+      if (fab) {
+        fab.classList.add('pulse');
+        setTimeout(function () {
+          fab.classList.remove('pulse');
+        }, 700);
+      }
       // a pílula "Meu pedido" do canto pulsa ao receber um item (04/10/2026)
       document.querySelectorAll('.cart-link').forEach(function (a) {
-        a.classList.remove('bump'); void a.offsetWidth; a.classList.add('bump');
-        setTimeout(function () { a.classList.remove('bump'); }, 600);
+        a.classList.remove('bump');
+        void a.offsetWidth;
+        a.classList.add('bump');
+        setTimeout(function () {
+          a.classList.remove('bump');
+        }, 600);
       });
     });
     form.classList.add('enhanced');
@@ -638,11 +792,18 @@
     return s;
   }
   function textoMensagem(itens, dados) {
-    var linhas = ['Olá! Montei meu pedido no site da Cakes JL e gostaria de confirmar os detalhes.', 'Nome: ' + dados.nome, '', 'Pedido:'];
+    var linhas = [
+      'Olá! Montei meu pedido no site da Cakes JL e gostaria de confirmar os detalhes.',
+      'Nome: ' + dados.nome,
+      '',
+      'Pedido:'
+    ];
     var total = 0, aCombinar = false;
     itens.forEach(function (i, k) {
       linhas.push((k + 1) + ') ' + linhaItem(i));
-      if (i.extras.length) linhas.push('   Adicionais: ' + i.extras.map(function (e) { return e.nome + ' (' + moeda(e.preco) + ')'; }).join('; '));
+      if (i.extras.length) linhas.push('   Adicionais: ' + i.extras.map(function (e) {
+        return e.nome + ' (' + moeda(e.preco) + ')';
+      }).join('; '));
       if (i.obs) linhas.push('   ' + i.obs);
       if (i.preco == null) aCombinar = true; else total += i.preco * i.qtd;
     });
@@ -672,12 +833,16 @@
     var dataEl = form.querySelector('[name=data]');
     var nomeEl = form.querySelector('[name=nome]');
     var horaEl = form.querySelector('[name=hora]');
-    var hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    var hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
     dataEl.min = hoje.toISOString().slice(0, 10);
 
     function mostrarErro(campo, msg) {
       var el = form.querySelector('[data-erro="' + campo + '"]');
-      if (el) { el.textContent = msg || ''; el.hidden = !msg; }
+      if (el) {
+        el.textContent = msg || '';
+        el.hidden = !msg;
+      }
       var input = form.querySelector('[name=' + campo + ']');
       if (input) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
     }
@@ -686,8 +851,14 @@
       lista.innerHTML = '';
       var temItens = itens.length > 0;
       if (caixa) caixa.hidden = false;
-      vazio.hidden = temItens; form.hidden = !temItens; resumo.hidden = !temItens; lista.hidden = !temItens;
-      if (!temItens) { atualizarContadores(itens); return; }
+      vazio.hidden = temItens;
+      form.hidden = !temItens;
+      resumo.hidden = !temItens;
+      lista.hidden = !temItens;
+      if (!temItens) {
+        atualizarContadores(itens);
+        return;
+      }
       var total = 0, aCombinar = false;
       itens.forEach(function (i) {
         var li = document.createElement('li');
@@ -698,23 +869,35 @@
         li.innerHTML =
           '<div class="cart-item-main"><strong>' + escapar(i.nome) + '</strong>' +
           (i.detalhes.length ? '<span>' + escapar(i.detalhes.join(' · ')) + '</span>' : '') +
-          (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) { return e.nome + ' (' + moeda(e.preco) + ')'; }).join(', ')) + '</span>' : '') +
+          (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) {
+            return e.nome + ' (' + moeda(e.preco) + ')';
+          }).join(', ')) + '</span>' : '') +
           (i.obs ? '<span>' + escapar(i.obs) + '</span>' : '') + '</div>' +
           '<div class="cart-item-side"><div class="qty"><button type="button" data-menos aria-label="Diminuir quantidade">−</button><input type="number" name="qtd" min="1" max="99" inputmode="numeric" value="' + i.qtd + '" aria-label="Quantidade"><button type="button" data-mais aria-label="Aumentar quantidade">+</button></div>' +
           '<strong class="cart-item-sub">' + sub + '</strong><button type="button" class="cart-remove" data-remover>Remover</button></div>';
         var input = li.querySelector('[name=qtd]');
-        function setQtd(n) { n = Math.max(1, Math.min(99, n || 1)); i.qtd = n; gravarPedido(itens); render(); }
+        function setQtd(n) {
+          n = Math.max(1, Math.min(99, n || 1));
+          i.qtd = n;
+          gravarPedido(itens);
+          render();
+        }
         li.querySelector('[data-menos]').addEventListener('click', function () { setQtd(i.qtd - 1); });
         li.querySelector('[data-mais]').addEventListener('click', function () { setQtd(i.qtd + 1); });
         input.addEventListener('change', function () { setQtd(parseInt(input.value, 10)); });
         li.querySelector('[data-remover]').addEventListener('click', function () {
-          var idx = itens.indexOf(i); if (idx > -1) itens.splice(idx, 1); gravarPedido(itens); render();
+          var idx = itens.indexOf(i);
+          if (idx > -1) itens.splice(idx, 1);
+          gravarPedido(itens);
+          render();
         });
         lista.appendChild(li);
       });
       resumo.querySelector('[data-total]').textContent = moeda(total);
       resumo.querySelector('[data-sinal]').textContent = moeda(total / 2);
-      document.querySelectorAll('[data-pix-sinal]').forEach(function (el) { el.textContent = moeda(total / 2); });
+      document.querySelectorAll('[data-pix-sinal]').forEach(function (el) {
+        el.textContent = moeda(total / 2);
+      });
       resumo.querySelector('[data-combinar]').hidden = !aCombinar;
       var h = prazoHoras(itens);
       prazoEl.textContent = h === PRAZO_TORTAS_H
@@ -741,7 +924,9 @@
       if (pixCheckout) pixCheckout.hidden = !ehPix;
       if (cartaoNota) cartaoNota.hidden = ehPix;
     }
-    form.querySelectorAll('[name=pagamento]').forEach(function (r) { r.addEventListener('change', atualizarPagamento); });
+    form.querySelectorAll('[name=pagamento]').forEach(function (r) {
+      r.addEventListener('change', atualizarPagamento);
+    });
     atualizarPagamento();
     nomeEl.addEventListener('input', function () { if (nomeEl.value.trim().length >= 2) mostrarErro('nome', ''); });
     dataEl.addEventListener('input', function () { if (dataEl.value) mostrarErro('data', ''); });
@@ -761,7 +946,10 @@
       exigir('nome', nomeEl, nome.length >= 2, 'Informe seu nome para continuar.');
       exigir('data', dataEl, !!dataEl.value, 'Escolha o dia em que gostaria de retirar.');
       exigir('hora', horaEl, !!horaEl.value, 'Informe o horário em que gostaria de retirar.');
-      if (primeiroErro) { primeiroErro.focus(); return; }
+      if (primeiroErro) {
+        primeiroErro.focus();
+        return;
+      }
       var pag = form.querySelector('[name=pagamento]:checked');
       var dados = {
         nome: nome,
@@ -777,7 +965,9 @@
       if (reenviar) reenviar.href = url;
       window.open(url, '_blank', 'noopener');
       // agradecimento: esconde lista e formulário; o pedido continua guardado para reenvio
-      lista.hidden = true; resumo.hidden = true; form.hidden = true;
+      lista.hidden = true;
+      resumo.hidden = true;
+      form.hidden = true;
       if (caixa) caixa.hidden = true;
       if (obrigado) {
         obrigado.hidden = false;
@@ -786,25 +976,34 @@
         var nomeSpan = obrigado.querySelector('[data-obrigado-nome]');
         if (nomeSpan) nomeSpan.textContent = nome;
         obrigado.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        var foco = obrigado.querySelector('h2'); if (foco) foco.focus();
+        var foco = obrigado.querySelector('h2');
+        if (foco) foco.focus();
       }
     });
     if (obrigado) {
       var editar = obrigado.querySelector('[data-editar]');
       if (editar) editar.addEventListener('click', function () {
-        obrigado.hidden = true; lista.hidden = false; resumo.hidden = false; form.hidden = false;
+        obrigado.hidden = true;
+        lista.hidden = false;
+        resumo.hidden = false;
+        form.hidden = false;
         if (caixa) caixa.hidden = false;
         lista.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
       var novo = obrigado.querySelector('[data-novo]');
       if (novo) novo.addEventListener('click', function () {
-        gravarPedido([]); obrigado.hidden = true; render();
+        gravarPedido([]);
+        obrigado.hidden = true;
+        render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     }
     var limpar = document.querySelector('[data-limpar]');
     if (limpar) limpar.addEventListener('click', function () {
-      if (window.confirm('Esvaziar o pedido?')) { gravarPedido([]); render(); }
+      if (window.confirm('Esvaziar o pedido?')) {
+        gravarPedido([]);
+        render();
+      }
     });
     render();
   }
@@ -812,9 +1011,15 @@
   /* Botão "Copiar" da chave Pix (04/10/2026): copia, mostra "Copiado!" por um instante e avisa no toast. */
   function copiarFallback(texto) {
     var ta = document.createElement('textarea');
-    ta.value = texto; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); } catch (_) {}
+    ta.value = texto;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+    } catch (_) {}
     document.body.removeChild(ta);
   }
   function ligarCopiar() {
@@ -829,10 +1034,20 @@
           b.classList.add('copied');
           toast('Chave Pix copiada.');
           clearTimeout(timer);
-          timer = setTimeout(function () { if (rotulo) rotulo.textContent = original; b.classList.remove('copied'); }, 1800);
+          timer = setTimeout(function () {
+            if (rotulo) rotulo.textContent = original;
+            b.classList.remove('copied');
+          }, 1800);
         };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(feito, function () { copiarFallback(texto); feito(); });
-        else { copiarFallback(texto); feito(); }
+        if (navigator.clipboard && navigator.clipboard.writeText)
+          navigator.clipboard.writeText(texto).then(feito, function () {
+            copiarFallback(texto);
+            feito();
+          });
+        else {
+          copiarFallback(texto);
+          feito();
+        }
       });
     });
   }
