@@ -23,7 +23,7 @@
      sem troca automática; o foco fica preso no popup e volta à miniatura. */
   function iniciarPopupDeFotos() {
     var grupos = Array.prototype.map.call(document.querySelectorAll('[data-photos]'), function (el) {
-      return { nome: el.dataset.photos, preco: el.dataset.price || '', links: Array.prototype.slice.call(el.querySelectorAll('a.thumb, a.slide')) };
+      return { nome: el.dataset.photos, preco: el.dataset.price || '', semDescricao: el.hasAttribute('data-hide-desc'), links: Array.prototype.slice.call(el.querySelectorAll('a.thumb, a.slide')) };
     }).filter(function (g) { return g.links.length; });
     if (!grupos.length) return;
 
@@ -64,12 +64,12 @@
     var grupo = null, atual = 0, origem = null;
 
     function dadosDaFoto(g, link) {
-      // título: o da foto (adicionais) ou o do grupo (produto); valor: o da foto (Bentô) ou o do grupo; descrição: a da foto ou o alt
+      // título: o da foto (adicionais) ou o do grupo (produto); valor: o da foto (Bentô) ou o do grupo; data-hide-desc deixa só nome e valor, mantendo o alt da imagem
       var img = link.querySelector('img');
       var alt = img ? img.alt : '';
       var nome = link.dataset.title || g.nome;
       return { src: link.getAttribute('href'), alt: alt, chapeu: nome === g.nome ? '' : g.nome, titulo: nome,
-        preco: link.dataset.price || g.preco, descricao: link.dataset.desc || alt };
+        preco: link.dataset.price || g.preco, descricao: g.semDescricao ? '' : (link.dataset.desc || alt) };
     }
     function texto(el, valor) { el.textContent = valor; el.hidden = !valor; }
     function mostrar(indice) {
