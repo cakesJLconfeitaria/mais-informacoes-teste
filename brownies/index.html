@@ -6,7 +6,7 @@
     <title>Brownies sob encomenda | Cakes JL</title>
     <meta
       name="description"
-      content="Brownie com cobertura e marmitinha brownie recheada com morango. Cobertura ou recheio de chocolate 50% cacau, de Ninho ou casadinho (chocolate + Ninho), sob encomenda na Cakes JL, em Gravatal, SC."
+      content="Brownie com cobertura e marmitinha brownie recheada com morango. Cobertura ou recheio à escolha: chocolate 50% cacau, ninho ou Dois amores (chocolate + ninho), sob encomenda na Cakes JL, em Gravatal, SC."
     >
     <meta name="theme-color" content="#fcecf1">
     <link rel="canonical" href="https://www.cakesjlconfeitaria.com.br/brownies/">
@@ -16,7 +16,7 @@
     <meta property="og:title" content="Brownies sob encomenda | Cakes JL">
     <meta
       property="og:description"
-      content="Brownie com cobertura e marmitinha brownie recheada com morango. Cobertura ou recheio de chocolate 50% cacau, de Ninho ou casadinho (chocolate + Ninho), sob encomenda na Cakes JL, em Gravatal, SC."
+      content="Brownie com cobertura e marmitinha brownie recheada com morango. Cobertura ou recheio à escolha: chocolate 50% cacau, ninho ou Dois amores (chocolate + ninho), sob encomenda na Cakes JL, em Gravatal, SC."
     >
     <meta property="og:url" content="https://www.cakesjlconfeitaria.com.br/brownies/">
     <meta property="og:image" content="https://www.cakesjlconfeitaria.com.br/logo.png">
@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=14">
-  <script src="../assets/pedido.js?v=13" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=15">
+  <script src="../assets/pedido.js?v=14" defer></script>
   </head>
   <body class="product-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -136,7 +136,7 @@
             </div>
             <div class="product-body">
               <h2 id="brownie-cobertura-titulo">Brownie com cobertura</h2>
-              <p>Massa de brownie com cobertura de chocolate 50% cacau, de Ninho ou casadinho (chocolate + Ninho juntos). Escolha a cobertura abaixo e adicione ao pedido.</p>
+              <p>Massa de brownie com cobertura à escolha: chocolate 50% cacau, ninho ou Dois amores (chocolate + ninho juntos). Escolha a cobertura abaixo e adicione ao pedido.</p>
               <p>Cada brownie pesa em média 140 g.</p>
               <p class="consult-price nojs-only">R$ 14,00 a unidade</p>
               <form
@@ -152,31 +152,33 @@
                     </label>
                     <label><input type="radio" name="sabor" value="Ninho"><span>Ninho<small>leite Ninho</small></span>
                     </label>
-                    <label><input type="radio" name="sabor" value="Casadinho (chocolate + Ninho)"><span>Casadinho<small>chocolate + Ninho</small></span>
+                    <label><input type="radio" name="sabor" value="Dois amores (chocolate + ninho)"><span>Dois amores<small>chocolate + ninho</small></span>
                     </label>
                   </div>
                 </div>
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="bc-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="bc-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg
@@ -253,7 +255,7 @@
             </div>
             <div class="product-body">
               <h2 id="marmitinha-titulo">Marmitinha brownie recheada</h2>
-              <p>Massa de brownie servida na marmitinha, com morango e recheio de chocolate 50% cacau, de Ninho ou casadinho (chocolate + Ninho juntos). O morango vai em todas as opções. Escolha o recheio abaixo e adicione ao pedido.</p>
+              <p>Massa de brownie servida na marmitinha, com morango e recheio à escolha: chocolate 50% cacau, ninho ou Dois amores (chocolate + ninho juntos). O morango vai em todas as opções. Escolha o recheio abaixo e adicione ao pedido.</p>
               <p>Cada marmitinha pesa em média 350 g.</p>
               <p class="consult-price nojs-only">R$ 24,90 a marmitinha</p>
               <form
@@ -269,31 +271,33 @@
                     </label>
                     <label><input type="radio" name="sabor" value="Ninho"><span>Ninho<small>leite Ninho</small></span>
                     </label>
-                    <label><input type="radio" name="sabor" value="Casadinho (chocolate + Ninho)"><span>Casadinho<small>chocolate + Ninho</small></span>
+                    <label><input type="radio" name="sabor" value="Dois amores (chocolate + ninho)"><span>Dois amores<small>chocolate + ninho</small></span>
                     </label>
                   </div>
                 </div>
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="mm-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="mm-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg

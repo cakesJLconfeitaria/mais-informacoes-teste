@@ -3,9 +3,10 @@
    uma mensagem de WhatsApp. Preços aqui devem bater com os das páginas e
    com Precificacao-produtos.xlsx. Criado em 03/10/2026; em 03/10/2026 o sabor
    dos produtos novos passou a ser escolhido por botões (chocolate 50% cacau,
-   Ninho ou casadinho), sem acréscimo. Em 04/10/2026 o horário de retirada
-   passou a ser obrigatório no checkout e o link "Meu pedido" saiu do menu de
-   categorias para o canto superior direito de todas as páginas (.cart-link).
+   Ninho ou a mistura de chocolate e ninho), sem acréscimo. Em 04/10/2026 o
+   horário de retirada passou a ser obrigatório no checkout e o link "Meu
+   pedido" saiu do menu de categorias para o canto superior direito de todas
+   as páginas (.cart-link).
    Ainda em 04/10/2026 a página de tortas passou a ter um formulário por linha
    (data-linha="Clássicos" | "Especiais" | "Premium"; vazio = outro sabor, a
    combinar), tamanho e sabor por botões, e os adicionais escolhidos num popup
@@ -35,7 +36,9 @@
    cacau", "Ninho" ou os dois separados por |; vazio = só chantilly).
    Vai na mensagem como "Cobertura: ...". Em 06/10/2026, a cobertura
    também passou a exigir escolha explícita, mesmo quando só há chantilly,
-   e a abrir um popup no mesmo estilo do seletor de sabor. */
+   e a abrir um popup no mesmo estilo do seletor de sabor. Ainda em 06/10/2026,
+   o sabor antes chamado casadinho passou a se chamar Dois amores nos brownies
+   e donuts; pedidos antigos com esse nome são lidos com o nome atual. */
 (function () {
   'use strict';
 
@@ -79,7 +82,16 @@
   function lerPedido() {
     try {
       var p = JSON.parse(localStorage.getItem(STORAGE) || '[]');
-      return Array.isArray(p) ? p : [];
+      if (!Array.isArray(p)) return [];
+      p.forEach(function (item) {
+        if (!item || ['brownie-cobertura', 'marmitinha', 'donuts'].indexOf(item.tipo) === -1 || !Array.isArray(item.detalhes)) return;
+        item.detalhes = item.detalhes.map(function (detalhe) {
+          return typeof detalhe === 'string'
+            ? detalhe.replace('Casadinho (chocolate + Ninho)', 'Dois amores (chocolate + ninho)')
+            : detalhe;
+        });
+      });
+      return p;
     } catch (_) {
       return [];
     }
@@ -194,7 +206,7 @@
       obs: ''
     };
     if (tipo === 'brownie-cobertura' || tipo === 'marmitinha' || tipo === 'donuts') {
-      // sabor escolhido por botões (radio); casadinho = chocolate + Ninho, mesmo preço
+      // sabor escolhido por botões (radio); Dois amores = chocolate + ninho, mesmo preço
       var saborEscolhido = form.querySelector('[name=sabor]:checked');
       item.detalhes.push(base.opcao + ': ' + (saborEscolhido ? saborEscolhido.value : ''));
     } else if (tipo === 'bento') {

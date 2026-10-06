@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=14">
-  <script src="../assets/pedido.js?v=13" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=15">
+  <script src="../assets/pedido.js?v=14" defer></script>
   </head>
   <body class="product-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -130,11 +130,11 @@
                         name="sabor"
                         value="Dois amores"
                         data-cobertura="Chocolate 50% cacau|Ninho"
-                      ><span>Dois amores<small>Massa branca ou de chocolate · recheio de chocolate 50% cacau e Ninho</small></span>
+                      ><span>Dois amores<small>Massa branca ou de chocolate · recheio de chocolate 50% cacau e ninho</small></span>
                     </label>
                     <label><input type="radio" name="sabor" value="Beijinho" data-cobertura=""><span>Beijinho<small>Massa branca · recheio de coco</small></span>
                     </label>
-                    <label><input type="radio" name="sabor" value="Ninho" data-cobertura="Ninho"><span>Ninho<small>Massa branca · recheio de Ninho</small></span>
+                    <label><input type="radio" name="sabor" value="Ninho" data-cobertura="Ninho"><span>Ninho<small>Massa branca · recheio de ninho</small></span>
                     </label>
                     <label><input type="radio" name="sabor" value="Prestígio" data-cobertura=""><span>Prestígio<small>Massa de chocolate · recheio de coco</small></span>
                     </label>
@@ -147,11 +147,11 @@
                   data-formato="Dois amores, massa {v}"
                   hidden
                 >
-                  <span class="field-label">Massa do Dois amores <em class="req">obrigatório</em></span>
+                  <span class="field-label">Escolha a massa</span>
                   <div class="choice-grid two">
                     <label><input type="radio" name="massa" value="branca"><span>Branca</span>
                     </label>
-                    <label><input type="radio" name="massa" value="de chocolate"><span>De chocolate</span>
+                    <label><input type="radio" name="massa" value="de chocolate"><span>Chocolate</span>
                     </label>
                   </div>
                 </div>
@@ -205,27 +205,29 @@
                   >
                   </textarea>
                 </div>
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="tc-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="tc-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg
@@ -288,7 +290,7 @@
                         data-cobertura="Chocolate 50% cacau"
                       ><span>Maracujá com brigadeiro<small>Massa de chocolate · recheio de maracujá e brigadeiro de chocolate 50% cacau</small></span>
                     </label>
-                    <label><input type="radio" name="sabor" value="Morangos" data-cobertura="creme"><span>Morangos<small>Massa branca · morangos com brigadeiro, Ninho, quatro leites ou nata</small></span>
+                    <label><input type="radio" name="sabor" value="Morangos" data-cobertura="creme"><span>Morangos<small>Massa branca · morangos com brigadeiro, ninho, quatro leites ou nata</small></span>
                     </label>
                   </div>
                 </div>
@@ -366,27 +368,29 @@
                   >
                   </textarea>
                 </div>
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="te-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="te-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg
@@ -449,14 +453,14 @@
                         name="sabor"
                         value="Ninho com geleia de morango"
                         data-cobertura="Ninho"
-                      ><span>Ninho com geleia de morango<small>Massa branca · recheio de Ninho e geleia de morango</small></span>
+                      ><span>Ninho com geleia de morango<small>Massa branca · recheio de ninho e geleia de morango</small></span>
                     </label>
                     <label><input
                         type="radio"
                         name="sabor"
                         value="Ninho com Nutella"
                         data-cobertura="Ninho"
-                      ><span>Ninho com Nutella<small>Massa branca · recheio de Ninho com Nutella</small></span>
+                      ><span>Ninho com Nutella<small>Massa branca · recheio de ninho com Nutella</small></span>
                     </label>
                     <label><input type="radio" name="sabor" value="Pistache" data-cobertura=""><span>Pistache<small>Massa branca · recheio de pistache</small></span>
                     </label>
@@ -521,27 +525,29 @@
                   >
                   </textarea>
                 </div>
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="tp-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="tp-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg
@@ -654,27 +660,29 @@
                   >
                   </textarea>
                 </div>
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="to-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="to-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg
@@ -751,27 +759,29 @@
                 data-produto="matilda"
                 aria-label="Adicionar Bolo Matilda ao pedido"
               >
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="mt-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="mt-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg
@@ -864,7 +874,7 @@
                         data-cobertura="Chocolate 50% cacau"
                       ><span>Brigadeiro ao leite<small>Massa branca · recheio de brigadeiro ao leite</small></span>
                     </label>
-                    <label><input type="radio" name="sabor" value="Ninho" data-cobertura="Ninho"><span>Ninho<small>Massa branca · recheio de Ninho</small></span>
+                    <label><input type="radio" name="sabor" value="Ninho" data-cobertura="Ninho"><span>Ninho<small>Massa branca · recheio de ninho</small></span>
                     </label>
                     <label><input type="radio" name="sabor" value="Beijinho" data-cobertura=""><span>Beijinho<small>Massa branca · recheio de coco</small></span>
                     </label>
@@ -873,7 +883,7 @@
                         name="sabor"
                         value="Ninho com geleia de morango"
                         data-cobertura="Ninho"
-                      ><span>Ninho com geleia de morango<small>Massa branca · recheio de Ninho e geleia de morango · + R$ 7,00</small></span>
+                      ><span>Ninho com geleia de morango<small>Massa branca · recheio de ninho e geleia de morango · + R$ 7,00</small></span>
                     </label>
                   </div>
                 </div>
@@ -896,27 +906,29 @@
                     placeholder="Ex.: Parabéns, Ana!"
                   >
                 </div>
-                <div class="qty-row js-only">
-                  <div class="qty">
-                    <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
-                    <input
-                      type="number"
-                      id="bt-qtd"
-                      name="qtd"
-                      value="1"
-                      min="1"
-                      max="99"
-                      inputmode="numeric"
-                      aria-label="Quantidade"
-                    >
-                    <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                <div class="price-panel js-only">
+                  <div class="qty-row">
+                    <div class="qty">
+                      <button type="button" data-menos aria-label="Diminuir quantidade">−</button>
+                      <input
+                        type="number"
+                        id="bt-qtd"
+                        name="qtd"
+                        value="1"
+                        min="1"
+                        max="99"
+                        inputmode="numeric"
+                        aria-label="Quantidade"
+                      >
+                      <button type="button" data-mais aria-label="Aumentar quantidade">+</button>
+                    </div>
                   </div>
-                </div>
-                <div class="final-price js-only" data-previa>
-                  <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
-                  </span>
-                  <strong class="final-price-value" data-previa-valor>
-                  </strong>
+                  <div class="final-price" data-previa>
+                    <span class="final-price-text"><span class="final-price-label">Preço final</span><small class="final-price-detail" data-previa-detalhe></small>
+                    </span>
+                    <strong class="final-price-value" data-previa-valor>
+                    </strong>
+                  </div>
                 </div>
                 <button class="button js-only" type="submit">
                   <svg

@@ -2276,6 +2276,65 @@ html:not(.js) .bento-pick input,html:not(.js) .pick-dot {
   }
 }
 
+/* Cards de produtos: quantidade e preço no mesmo cartão. */
+.price-panel {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  background: var(--soft);
+  border: 1.5px solid var(--line-strong);
+  border-radius: 12px
+}
+
+.price-panel .final-price {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 7px;
+  padding: 12px 0 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-strong);
+  border-radius: 0
+}
+
+.price-panel .final-price-text {
+  display: contents
+}
+
+.price-panel .final-price-label {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 12px
+}
+
+.price-panel .final-price-value {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 22px
+}
+
+.price-panel .final-price-detail {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink)
+}
+
+@media(max-width:380px) {
+  .price-panel {
+    padding: 12px
+  }
+  .price-panel .final-price-value {
+    font-size: 19px
+  }
+  .price-panel .final-price-detail {
+    font-size: 13px
+  }
+}
+
 
 /* P23 (04/10/2026): área dos itens em cartão rosa claro — vazia (ícone, frase e as três linhas do cardápio) ou com itens em cartões brancos */
 .cart-box {
