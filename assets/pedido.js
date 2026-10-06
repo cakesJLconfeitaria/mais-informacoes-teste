@@ -255,18 +255,7 @@
     var fechar = picker.querySelector('[data-addons-close]');
     var painel = document.querySelector('.panel');
     var formAtivo = null, origem = null;
-    var menor = caixas.reduce(function (m, c) {
-      var p = parseFloat(c.dataset.preco);
-      return isNaN(p) ? m : Math.min(m, p);
-    }, Infinity);
-    var maior = caixas.reduce(function (m, c) {
-      var p = parseFloat(c.dataset.preco);
-      return isNaN(p) ? m : Math.max(m, p);
-    }, -Infinity);
-    var dica = 'Veja as ' + caixas.length + ' opções com foto' +
-      (isFinite(menor) && isFinite(maior)
-        ? ', de ' + moeda(menor).replace(' ', '\u00a0') + ' a ' + moeda(maior).replace(' ', '\u00a0')
-        : '');
+    var dica = 'Veja as ' + caixas.length + ' opções com foto';
 
     document.body.appendChild(picker);
     picker.classList.add('enhanced');
