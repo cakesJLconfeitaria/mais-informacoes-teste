@@ -2937,6 +2937,10 @@ html.js .nojs-only {
 
 
 /* 06/10/2026: campo "Cobertura" das tortas e do Bentô (opções conforme o sabor, montadas pelo pedido.js) */
+.cobertura-field.enhanced [data-cobertura-opcoes] {
+  display: none!important
+}
+
 .choice-grid.one {
   grid-template-columns: 1fr
 }

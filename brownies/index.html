@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=13">
-    <script src="../assets/pedido.js?v=10" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=14">
+  <script src="../assets/pedido.js?v=13" defer></script>
   </head>
   <body class="product-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -145,9 +145,10 @@
                 aria-label="Adicionar brownie com cobertura ao pedido"
               >
                 <div class="field">
-                  <span class="field-label">Cobertura</span>
+                  <span class="field-label">Cobertura <em class="req">obrigatório</em></span>
+                  <small class="field-hint" data-sabor-dica>Escolha uma opção.</small>
                   <div class="choice-grid">
-                    <label><input type="radio" name="sabor" value="Chocolate 50% cacau" checked><span>Chocolate<small>50% cacau</small></span>
+                    <label><input type="radio" name="sabor" value="Chocolate 50% cacau"><span>Chocolate<small>50% cacau</small></span>
                     </label>
                     <label><input type="radio" name="sabor" value="Ninho"><span>Ninho<small>leite Ninho</small></span>
                     </label>
@@ -261,9 +262,10 @@
                 aria-label="Adicionar marmitinha ao pedido"
               >
                 <div class="field">
-                  <span class="field-label">Recheio</span>
+                  <span class="field-label">Recheio <em class="req">obrigatório</em></span>
+                  <small class="field-hint" data-sabor-dica>Escolha uma opção.</small>
                   <div class="choice-grid">
-                    <label><input type="radio" name="sabor" value="Chocolate 50% cacau" checked><span>Chocolate<small>50% cacau</small></span>
+                    <label><input type="radio" name="sabor" value="Chocolate 50% cacau"><span>Chocolate<small>50% cacau</small></span>
                     </label>
                     <label><input type="radio" name="sabor" value="Ninho"><span>Ninho<small>leite Ninho</small></span>
                     </label>
