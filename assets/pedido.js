@@ -22,7 +22,18 @@
    da lista ([data-carrinho]) e o quadro do Pix com botão Copiar ([data-pix]),
    mostrado ao marcar Pix e na tela final; a mensagem leva a chave Pix. O
    formato dos itens guardados mudou (extras com preco), por isso STORAGE
-   passou de v1 para v2. */
+   passou de v1 para v2. Em 06/10/2026 o sabor das tortas e do Bentô passou a
+   ser escolhido num popup ([data-flavor-picker], criado aqui): o card mostra o
+   sabor escolhido e o botão que abre a lista; os botões de sabor continuam no
+   HTML (sem JavaScript aparecem no card) e são eles que guardam a escolha.
+   Ainda em 06/10/2026: cada sabor ganhou a descrição da Larissa (<small> no
+   botão); as escolhas que dependem do sabor ficam em campos [data-campo]
+   com data-para (o sabor) e data-formato (Morangos com {v}; Dois amores,
+   massa {v}); e tortas e Bentô ganharam o campo obrigatório "Cobertura"
+   ([data-cobertura-campo]): Chantilly e, quando o sabor tem, o recheio mais
+   barato dele (data-cobertura no botão do sabor ou do creme: "Chocolate 50%
+   cacau", "Ninho" ou os dois separados por |; vazio = só chantilly, já
+   marcado). Vai na mensagem como "Cobertura: ...". */
 (function () {
   'use strict';
 
@@ -113,6 +124,19 @@
     var q = parseInt(form.querySelector('[name=qtd]').value, 10);
     return isNaN(q) || q < 1 ? 1 : Math.min(q, 99);
   }
+  /* Escolhas que dependem do sabor (06/10/2026): um campo [data-campo] com
+     data-para="<sabor>" e data-formato="Morangos com {v}" (ou "Dois amores,
+     massa {v}") aparece quando aquele sabor está marcado. */
+  function campoDoSabor(form, valor) {
+    var achado = null;
+    form.querySelectorAll('[data-campo][data-para]').forEach(function (c) { if (c.dataset.para === valor) achado = c; });
+    return achado;
+  }
+  function nomeComEscolha(form, valor) {
+    var sub = campoDoSabor(form, valor);
+    var marcada = sub && sub.querySelector('input:checked');
+    return marcada ? sub.dataset.formato.replace('{v}', marcada.value) : valor;
+  }
   function montarItem(form) {
     var tipo = form.dataset.produto;
     var base = CATALOGO[tipo];
@@ -129,6 +153,8 @@
       item.preco = BENTO[op].preco + (sabor === 'Ninho com geleia de morango' ? BENTO.geleia : 0);
       item.detalhes.push(BENTO[op].nome);
       item.detalhes.push('Sabor: ' + sabor + (sabor === 'Ninho com geleia de morango' ? ' (+ ' + moeda(BENTO.geleia) + ')' : ''));
+      var coberturaB = form.querySelector('[name=cobertura]:checked');
+      if (coberturaB) item.detalhes.push('Cobertura: ' + coberturaB.value);
       var escrita = form.querySelector('[name=escrita]').value.trim();
       if (escrita) item.detalhes.push('Frase ou desenho: ' + escrita);
     } else if (tipo === 'torta') {
@@ -144,13 +170,12 @@
         var saborEscolhidoT = form.querySelector('[name=sabor]:checked');
         saborT = saborEscolhidoT ? saborEscolhidoT.value : '';
         item.preco = TORTA.linhas[linha][tam];
-        if (saborT === 'Morangos') {
-          var creme = form.querySelector('[name=morangos]:checked');
-          saborT = 'Morangos com ' + (creme ? creme.value : '');
-        }
+        saborT = nomeComEscolha(form, saborT);
       }
       item.nome = 'Torta ' + TORTA.tamanhos[tam];
       item.detalhes.push(saborT + (linha ? ' (' + linha + ')' : ''));
+      var coberturaT = form.querySelector('[name=cobertura]:checked');
+      if (coberturaT) item.detalhes.push('Cobertura: ' + coberturaT.value);
       // adicionais com preço fechado (04/10/2026): somam no preço de cada torta
       (form._adicionais || []).forEach(function (a) {
         item.extras.push({ nome: a.nome, preco: a.preco });
@@ -271,6 +296,250 @@
       resumo(form);
     });
   }
+  /* ---------- popup de sabores (tortas e Bentô, 06/10/2026) ----------
+     Os botões de sabor (radio name=sabor, e name=morangos nos Especiais)
+     continuam no formulário e guardam a escolha; com JavaScript eles ficam
+     escondidos e o card mostra o sabor escolhido num botão que abre este popup
+     com a lista (nome e, quando houver, a descrição em <small> no HTML).
+     Tocar num sabor já escolhe; "Escolher ...", X, toque fora e Esc fecham. */
+  var abrirSabores = null;
+  var ICONE_SETA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+  function partesDoSabor(input) {
+    // nome = texto do <span> sem o <small>; descrição = o <small> (detalhe, preço extra ou, no futuro, o que leva o sabor)
+    var span = input.parentNode.querySelector('span');
+    var nome = '', desc = '';
+    if (span) {
+      Array.prototype.forEach.call(span.childNodes, function (n) {
+        if (n.nodeType === 3) nome += n.textContent;
+        else if (n.tagName === 'SMALL') desc = n.textContent;
+        else nome += n.textContent;
+      });
+    }
+    return { nome: nome.trim() || input.value, desc: desc.trim() };
+  }
+  function nomeEscolhido(form) {
+    var r = form.querySelector('.flavor-field [name=sabor]:checked');
+    if (!r) return '';
+    var sub = campoDoSabor(form, r.value);
+    return sub ? nomeComEscolha(form, r.value) : partesDoSabor(r).nome;
+  }
+  function iniciarSabores() {
+    if (!document.querySelector('.flavor-field')) return;
+    var picker = document.createElement('section');
+    picker.className = 'addons-picker enhanced flavor-picker';
+    picker.hidden = true;
+    picker.setAttribute('data-flavor-picker', '');
+    picker.setAttribute('role', 'dialog');
+    picker.setAttribute('aria-modal', 'true');
+    picker.setAttribute('aria-labelledby', 'sabores-titulo');
+    picker.innerHTML =
+      '<div class="addons-box"><header class="addons-head"><div><h2 id="sabores-titulo"></h2><p data-sabores-sub></p></div>' +
+      '<button type="button" class="addons-close" data-sabores-fechar aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>' +
+      '<div class="flavor-options" role="radiogroup" aria-labelledby="sabores-titulo" data-sabores-lista></div>' +
+      '<footer class="addons-foot"><button type="button" class="button" data-sabores-ok>Escolher</button></footer></div>';
+    document.body.appendChild(picker);
+    var caixa = picker.querySelector('.addons-box');
+    var titulo = picker.querySelector('#sabores-titulo');
+    var sub = picker.querySelector('[data-sabores-sub]');
+    var lista = picker.querySelector('[data-sabores-lista]');
+    var ok = picker.querySelector('[data-sabores-ok]');
+    var fechar = picker.querySelector('[data-sabores-fechar]');
+    var painel = document.querySelector('.panel');
+    var formAtivo = null, origem = null;
+
+    function atualizarOk() { ok.textContent = 'Escolher ' + nomeEscolhido(formAtivo); }
+    function marcarNoForm(nome, valor) {
+      var r = formAtivo.querySelector('[name="' + nome + '"][value="' + valor.replace(/"/g, '\\"') + '"]');
+      if (!r) return;
+      r.checked = true;
+      r.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    function montarLista(form) {
+      lista.innerHTML = '';
+      var radios = form.querySelectorAll('.flavor-field [name=sabor]');
+      Array.prototype.forEach.call(radios, function (r, i) {
+        var partes = partesDoSabor(r);
+        var item = document.createElement('div');
+        item.className = 'flavor-option';
+        item.innerHTML = '<label class="flavor-pick"><input type="radio" name="sabor-popup"><span class="flavor-pick-text"><strong></strong>' +
+          (partes.desc ? '<small></small>' : '') + '</span><span class="pick-dot" aria-hidden="true"></span></label>';
+        var input = item.querySelector('input');
+        input.value = r.value;
+        input.checked = r.checked;
+        item.querySelector('strong').textContent = partes.nome;
+        if (partes.desc) item.querySelector('small').textContent = partes.desc;
+        input.addEventListener('change', function () {
+          marcarNoForm('sabor', r.value);
+          atualizarSub();
+          atualizarOk();
+        });
+        var sub = campoDoSabor(form, r.value);
+        if (sub) {
+          var nomeCampo = sub.dataset.campo;
+          var rotulo = sub.querySelector('.field-label');
+          var bloco = document.createElement('div');
+          bloco.className = 'flavor-sub';
+          bloco.setAttribute('data-sabores-sub', r.value);
+          bloco.innerHTML = '<span class="field-label" id="sabores-sub-' + i + '"></span><div class="choice-grid" role="radiogroup" aria-labelledby="sabores-sub-' + i + '"></div>';
+          bloco.querySelector('.field-label').textContent = rotulo ? rotulo.textContent : '';
+          var grade = bloco.querySelector('.choice-grid');
+          sub.querySelectorAll('input[name="' + nomeCampo + '"]').forEach(function (c) {
+            var l = document.createElement('label');
+            l.innerHTML = '<input type="radio"><span></span>';
+            var ci = l.querySelector('input');
+            ci.name = nomeCampo + '-popup'; ci.value = c.value; ci.checked = c.checked;
+            var texto = c.parentNode.querySelector('span');
+            l.querySelector('span').textContent = texto ? texto.textContent : c.value;
+            ci.addEventListener('change', function () { marcarNoForm(nomeCampo, c.value); atualizarOk(); });
+            grade.appendChild(l);
+          });
+          item.appendChild(bloco);
+        }
+        lista.appendChild(item);
+      });
+      atualizarSub();
+    }
+    function atualizarSub() {
+      var m = formAtivo.querySelector('.flavor-field [name=sabor]:checked');
+      lista.querySelectorAll('[data-sabores-sub]').forEach(function (bloco) {
+        bloco.hidden = !(m && m.value === bloco.getAttribute('data-sabores-sub'));
+      });
+    }
+    function focaveis() {
+      return Array.prototype.filter.call(picker.querySelectorAll('button, input'), function (el) {
+        return !el.disabled && el.offsetParent !== null && (el.type !== 'radio' || el.checked);
+      });
+    }
+    function abrir(form, botao) {
+      formAtivo = form; origem = botao;
+      var nome = form.dataset.linha ? 'Sabores ' + form.dataset.linha : 'Sabores do Bentô Cake';
+      titulo.textContent = nome;
+      sub.textContent = form.dataset.produto === 'bento' ? 'Escolha o sabor do seu Bentô Cake.' : 'Escolha o sabor da sua torta.';
+      montarLista(form);
+      atualizarOk();
+      picker.hidden = false;
+      caixa.scrollTop = 0;
+      document.body.classList.add('picker-open');
+      if (painel && 'inert' in painel) painel.inert = true;
+      var marcado = lista.querySelector('[name=sabor-popup]:checked');
+      (marcado || fechar).focus({ preventScroll: true });
+    }
+    function encerrar() {
+      if (picker.hidden) return;
+      picker.hidden = true;
+      document.body.classList.remove('picker-open');
+      if (painel && 'inert' in painel) painel.inert = false;
+      if (formAtivo && formAtivo._resumoSabor) formAtivo._resumoSabor();
+      if (origem) origem.focus();
+      formAtivo = null; origem = null;
+    }
+    ok.addEventListener('click', encerrar);
+    fechar.addEventListener('click', encerrar);
+    picker.addEventListener('click', function (event) { if (event.target === picker) encerrar(); });
+    document.addEventListener('keydown', function (event) {
+      if (picker.hidden || event.defaultPrevented) return;
+      if (event.key === 'Escape') { event.preventDefault(); encerrar(); return; }
+      if (event.key !== 'Tab') return;
+      var itens = focaveis();
+      if (!itens.length) return;
+      var primeiro = itens[0], ultimo = itens[itens.length - 1];
+      if (event.shiftKey && (document.activeElement === primeiro || !picker.contains(document.activeElement))) { event.preventDefault(); ultimo.focus(); }
+      else if (!event.shiftKey && (document.activeElement === ultimo || !picker.contains(document.activeElement))) { event.preventDefault(); primeiro.focus(); }
+    });
+    abrirSabores = abrir;
+  }
+  function ligarSabor(form) {
+    var campo = form.querySelector('.flavor-field');
+    if (!campo || !abrirSabores) return;
+    var total = campo.querySelectorAll('[name=sabor]').length;
+    var botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'flavor-trigger';
+    botao.setAttribute('aria-haspopup', 'dialog');
+    botao.innerHTML = '<span class="flavor-summary"><strong></strong><small></small></span><span class="flavor-action">' + total + ' sabores</span>' + ICONE_SETA;
+    var forte = botao.querySelector('strong');
+    var detalhe = botao.querySelector('small');
+    form._resumoSabor = function () {
+      var r = campo.querySelector('[name=sabor]:checked');
+      var partes = r ? partesDoSabor(r) : { nome: '', desc: '' };
+      var nome = nomeEscolhido(form);
+      forte.textContent = nome;
+      detalhe.textContent = partes.desc;
+      detalhe.hidden = !partes.desc;
+      botao.classList.toggle('has-desc', !detalhe.hidden);
+      botao.setAttribute('aria-label', 'Sabor: ' + nome + '. Ver os ' + total + ' sabores');
+    };
+    form._resumoSabor();
+    botao.addEventListener('click', function () { abrirSabores(form, botao); });
+    var rotulo = campo.querySelector('.field-label');
+    if (rotulo && rotulo.nextSibling) campo.insertBefore(botao, rotulo.nextSibling); else campo.appendChild(botao);
+    campo.classList.add('enhanced');
+  }
+
+  /* Cobertura das tortas e do Bentô (06/10/2026, decisão de Jonas com a Larissa):
+     Chantilly sempre; além dele, o recheio mais barato que o sabor tiver
+     (Ninho ou chocolate 50% cacau, em data-cobertura). Sem outra opção, só
+     Chantilly, já marcado; com mais de uma, nada vem marcado e o cliente
+     precisa escolher antes de adicionar. No card "Outro sabor", Chantilly ou
+     "Recheio (a combinar)". */
+  var ROTULO_COBERTURA = { 'Chantilly': ['Chantilly', ''], 'Chocolate 50% cacau': ['Chocolate', '50% cacau'], 'Ninho': ['Ninho', ''], 'Recheio (a combinar)': ['Recheio', 'combinamos qual'] };
+  function opcoesDeCobertura(form, campo) {
+    if (campo.dataset.coberturaOutro) return ['Chantilly', 'Recheio (a combinar)'];
+    var r = form.querySelector('.flavor-field [name=sabor]:checked');
+    var lista = r ? (r.dataset.cobertura || '') : '';
+    if (lista === 'creme') {
+      var sub = campoDoSabor(form, r.value);
+      var c = sub && sub.querySelector('input:checked');
+      lista = c ? (c.dataset.cobertura || '') : '';
+    }
+    return ['Chantilly'].concat(lista ? lista.split('|') : []);
+  }
+  function ligarCobertura(form) {
+    var campo = form.querySelector('[data-cobertura-campo]');
+    if (!campo) return;
+    var grade = campo.querySelector('[data-cobertura-opcoes]');
+    var dica = campo.querySelector('[data-cobertura-dica]');
+    var erro = campo.querySelector('[data-cobertura-erro]');
+    var base = dica ? dica.textContent : '';
+    grade.setAttribute('role', 'radiogroup');
+    grade.setAttribute('aria-label', 'Cobertura');
+    function desenhar() {
+      var opcoes = opcoesDeCobertura(form, campo);
+      // só mantém a escolha feita pelo cliente; o Chantilly marcado sozinho (sabor sem outra opção) não conta como escolha
+      var atual = campo._escolhida || '';
+      grade.innerHTML = '';
+      grade.className = 'choice-grid' + (opcoes.length === 1 ? ' one' : opcoes.length === 2 ? ' two' : '');
+      opcoes.forEach(function (v) {
+        var l = document.createElement('label');
+        l.innerHTML = '<input type="radio" name="cobertura"><span></span>';
+        var input = l.querySelector('input');
+        input.value = v;
+        input.checked = v === atual || opcoes.length === 1;
+        var rotulo = ROTULO_COBERTURA[v] || [v, ''];
+        var span = l.querySelector('span');
+        span.textContent = rotulo[0];
+        if (rotulo[1]) { var sm = document.createElement('small'); sm.textContent = rotulo[1]; span.appendChild(sm); }
+        input.addEventListener('change', function () { campo._escolhida = v; if (erro) erro.hidden = true; });
+        grade.appendChild(l);
+      });
+      if (dica) dica.textContent = base + (opcoes.length === 1 ? ' Neste sabor, ela é de chantilly.' : '');
+      if (erro && opcoes.length === 1) erro.hidden = true;
+    }
+    form.addEventListener('change', function (event) {
+      var t = event.target;
+      if (t.name === 'sabor' || (t.closest && t.closest('[data-campo]'))) desenhar();
+    });
+    form._coberturaOk = function () {
+      if (form.querySelector('[name=cobertura]:checked')) return true;
+      if (erro) erro.hidden = false;
+      campo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var primeiro = grade.querySelector('input');
+      if (primeiro) primeiro.focus({ preventScroll: true });
+      return false;
+    };
+    desenhar();
+  }
+
   /* Faixa "Preço final" (04/10/2026): valor unitário × quantidade e uma linha de
      detalhe ("2× tamanho M · 2 adicionais"). unit == null mostra "Valor a combinar". */
   function mostrarPrevia(form, unit, detalhe) {
@@ -313,14 +582,14 @@
       form._atualizarPrevia = function () { mostrarPrevia(form, CATALOGO.matilda.preco, 'Tamanho M · aro 20'); };
       form._atualizarPrevia();
     }
+    if (tipo === 'torta' || tipo === 'bento') { ligarSabor(form); ligarCobertura(form); }
     if (tipo === 'torta') {
       // tamanho e sabor por botões; a faixa mostra tamanho × quantidade mais os adicionais (ou "a combinar" no card de outro sabor)
       var linhaT = form.dataset.linha || '';
-      var campoMorangos = form.querySelector('[data-campo=morangos]');
       form._atualizarPrevia = function () {
         var sabor = form.querySelector('[name=sabor]:checked');
         var tam = form.querySelector('[name=tamanho]:checked');
-        if (campoMorangos) campoMorangos.hidden = !(sabor && sabor.value === 'Morangos');
+        form.querySelectorAll('[data-campo][data-para]').forEach(function (c) { c.hidden = !(sabor && sabor.value === c.dataset.para); });
         var extras = form._adicionais || [];
         var detalhe = (tam ? 'tamanho ' + tam.value : '') + textoAdicionais(extras);
         if (!linhaT || !TORTA.linhas[linhaT] || !tam) mostrarPrevia(form, null, detalhe);
@@ -344,6 +613,7 @@
     }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
+      if (form._coberturaOk && !form._coberturaOk()) return; // cobertura obrigatória nas tortas e no Bentô (06/10/2026)
       var item = montarItem(form);
       var itens = lerPedido();
       itens.push(item);
@@ -571,6 +841,7 @@
     montarFab();
     ligarCopiar();
     iniciarAdicionais();
+    iniciarSabores();
     document.querySelectorAll('form[data-produto]').forEach(ligarFormulario);
     if (document.querySelector('[data-checkout]')) iniciarCheckout();
     atualizarContadores(lerPedido());

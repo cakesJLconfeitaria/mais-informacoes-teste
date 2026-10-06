@@ -23,7 +23,7 @@
      sem troca automática; o foco fica preso no popup e volta à miniatura. */
   function iniciarPopupDeFotos() {
     var grupos = Array.prototype.map.call(document.querySelectorAll('[data-photos]'), function (el) {
-      return { nome: el.dataset.photos, preco: el.dataset.price || '', links: Array.prototype.slice.call(el.querySelectorAll('a.thumb')) };
+      return { nome: el.dataset.photos, preco: el.dataset.price || '', links: Array.prototype.slice.call(el.querySelectorAll('a.thumb, a.slide')) };
     }).filter(function (g) { return g.links.length; });
     if (!grupos.length) return;
 
@@ -105,7 +105,15 @@
       document.body.classList.remove('lightbox-open');
       if (painel && 'inert' in painel) painel.inert = false;
       imagem.removeAttribute('src');
-      if (origem) origem.focus();
+      // no carrossel, volta para a foto que estava aberta no popup (06/10/2026)
+      var vista = grupo && grupo.links[atual];
+      if (vista && vista.classList.contains('slide') && vista !== origem) {
+        var trilho = vista.parentNode;
+        trilho.style.scrollBehavior = 'auto'; // pula direto, sem animar por trás do popup
+        trilho.scrollLeft = vista.offsetLeft;
+        trilho.style.scrollBehavior = '';
+        vista.focus({ preventScroll: true });
+      } else if (origem) origem.focus();
       grupo = null; origem = null;
     }
 
@@ -162,6 +170,63 @@
     });
   }
 
+  /* Carrossel no topo dos cards (06/10/2026): as fotos ocupam a largura do card
+     e deslizam para o lado (scroll-snap, que funciona sem JavaScript). Aqui
+     ganham setas e pontos; com uma foto só, fica só a foto. Tocar na foto
+     abre o popup acima (a.slide entra no mesmo grupo [data-photos]). */
+  function iniciarCarrosseis() {
+    var ANT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>';
+    var PROX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+    var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.carousel').forEach(function (carrossel) {
+      var trilho = carrossel.querySelector('[data-carousel-track]');
+      if (!trilho) return;
+      var fotos = Array.prototype.slice.call(trilho.querySelectorAll('.slide'));
+      if (fotos.length < 2) { carrossel.classList.add('single'); return; }
+      function botao(classe, rotulo, icone) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'carousel-arrow ' + classe; b.setAttribute('aria-label', rotulo); b.innerHTML = icone;
+        carrossel.appendChild(b);
+        return b;
+      }
+      var anterior = botao('carousel-prev', 'Foto anterior', ANT);
+      var proxima = botao('carousel-next', 'Próxima foto', PROX);
+      var pontos = document.createElement('div');
+      pontos.className = 'carousel-dots';
+      var marcas = fotos.map(function (foto, i) {
+        var p = document.createElement('button');
+        p.type = 'button'; p.setAttribute('aria-label', 'Foto ' + (i + 1) + ' de ' + fotos.length);
+        p.addEventListener('click', function () { ir(i); });
+        pontos.appendChild(p);
+        return p;
+      });
+      carrossel.appendChild(pontos);
+      var atual = -1;
+      function marcar(i) {
+        if (i === atual) return;
+        atual = i;
+        marcas.forEach(function (m, k) { m.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+        anterior.disabled = i === 0;
+        proxima.disabled = i === fotos.length - 1;
+      }
+      function ir(i) {
+        i = Math.max(0, Math.min(fotos.length - 1, i));
+        trilho.scrollTo({ left: fotos[i].offsetLeft, behavior: calmo ? 'auto' : 'smooth' });
+        marcar(i);
+      }
+      anterior.addEventListener('click', function () { ir(atual - 1); });
+      proxima.addEventListener('click', function () { ir(atual + 1); });
+      var quadro = 0;
+      trilho.addEventListener('scroll', function () {
+        cancelAnimationFrame(quadro);
+        quadro = requestAnimationFrame(function () {
+          marcar(Math.round(trilho.scrollLeft / Math.max(1, trilho.clientWidth)));
+        });
+      }, { passive: true });
+      marcar(0);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     applyTheme(document.documentElement.dataset.theme);
     var toggle = document.querySelector('[data-theme-toggle]');
@@ -170,6 +235,7 @@
       applyTheme(theme);
       try { localStorage.setItem('theme', theme); } catch (_) {}
     });
+    iniciarCarrosseis();
     iniciarPopupDeFotos();
   });
 })();
