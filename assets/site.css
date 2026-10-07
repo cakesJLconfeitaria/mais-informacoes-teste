@@ -3101,3 +3101,79 @@ html.js .nojs-only {
 .cobertura-field .field-error {
   margin-top: 0
 }
+
+
+/* P52 (07/10/2026): título, pedido e orientação reunidos no mesmo cartão. */
+.order-card {
+  margin-top: 28px;
+  padding: 16px
+}
+
+.order-heading .title-row {
+  margin-bottom: 18px
+}
+
+.order-card .empty-state {
+  padding: 0;
+  gap: 6px
+}
+
+.order-guidance {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-strong);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  text-align: center
+}
+
+.order-card .thanks {
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: transparent
+}
+
+
+/* P53 (07/10/2026): redes e pedido lado a lado apenas nos rodapés internos. */
+.footer-with-actions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line)
+}
+
+.footer-with-actions .footer-help {
+  margin: 0 0 18px;
+  font-size: 12px;
+  color: var(--muted)
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px
+}
+
+.footer-actions .social-links {
+  gap: 8px
+}
+
+.footer-actions .cart-link {
+  position: static;
+  flex-shrink: 0;
+  view-transition-name: footer-cart
+}
+
+@media(max-width:380px) {
+  .footer-actions {
+    gap: 8px
+  }
+  .footer-actions .social-links {
+    gap: 4px
+  }
+  .footer-actions .social-links a {
+    width: 32px
+  }
+}

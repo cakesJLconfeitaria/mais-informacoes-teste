@@ -30,7 +30,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=19">
+    <link rel="stylesheet" href="../assets/site.css?v=21">
   <script src="../assets/pedido.js?v=16" defer></script>
   </head>
   <body class="product-page pedido-page">
@@ -102,82 +102,128 @@
       </nav>
 
       <main id="conteudo">
-        <header class="page-title title-card">
-          <div class="title-row">
-            <span class="title-icon">
+        <section class="cart-box order-card" aria-labelledby="pedido-titulo">
+          <header class="order-heading">
+            <div class="title-row">
+              <span class="title-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 5h2l2 11h11l2-8H6"/>
+                  <circle cx="9" cy="20" r="1.3"/>
+                  <circle cx="17" cy="20" r="1.3"/>
+                </svg>
+              </span>
+              <h1 id="pedido-titulo">Meu pedido</h1>
+            </div>
+          </header>
+          <div data-carrinho>
+            <div class="empty-state" data-vazio>
+              <h2>Seu pedido ainda está vazio</h2>
+              <p>O que você gostaria de encomendar?</p>
+              <nav class="category-list" aria-label="Cardápio de produtos">
+                <a class="catalog-row" href="../tortas/index.html"><span><strong>Tortas e bolos</strong><small>Escolha o sabor, o tamanho e a decoração</small></span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    aria-hidden="true"
+                  >
+                    <path d="m9 5 7 7-7 7"/>
+                  </svg>
+                </a>
+                <a class="catalog-row" href="../brownies/index.html"><span><strong>Brownies</strong><small>Com cobertura e marmitinha recheada</small></span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    aria-hidden="true"
+                  >
+                    <path d="m9 5 7 7-7 7"/>
+                  </svg>
+                </a>
+                <a class="catalog-row" href="../donuts/index.html"><span><strong>Donuts</strong><small>No copinho com 6 unidades, cobertura de chocolate e recheio na tampa</small></span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    aria-hidden="true"
+                  >
+                    <path d="m9 5 7 7-7 7"/>
+                  </svg>
+                </a>
+              </nav>
+            </div>
+            <ul class="cart-list" data-lista aria-label="Itens do pedido">
+            </ul>
+            <p class="order-guidance">Depois de escolher, preencha seus dados e continue no WhatsApp. A confirmação e o pagamento acontecem na conversa.</p>
+          </div>
+          <section class="thanks" data-obrigado hidden aria-live="polite">
+            <h2 tabindex="-1">Seu pedido está pronto, <span data-obrigado-nome></span>!</h2>
+            <p>Para enviar seu pedido, confira a mensagem no WhatsApp e toque em enviar por lá. Na conversa, confirmamos a data, o horário e os detalhes do seu pedido. Seu pedido será confirmado com o pagamento do sinal.</p>
+            <div class="pix-box" data-pix data-pix-obrigado hidden>
+              <div class="pix-head">
+                <span class="pix-label">Pix para o sinal</span>
+                <span class="pix-sinal">Sinal de 50%: <strong data-pix-sinal>R$ 0,00</strong>
+                </span>
+              </div>
+              <div class="pix-key-row">
+                <code class="pix-key">cakesjlconfeitaria@gmail.com</code>
+                <button
+                  type="button"
+                  class="pix-copy"
+                  data-copiar="cakesjlconfeitaria@gmail.com"
+                  aria-label="Copiar chave Pix"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    aria-hidden="true"
+                  >
+                    <rect x="9" y="9" width="11" height="11" rx="2"/>
+                    <path d="M5 15V5a1 1 0 0 1 1-1h10"/>
+                  </svg>
+                  <span data-copiar-texto>Copiar</span>
+                </button>
+              </div>
+              <p class="pix-meta">Chave do tipo e-mail · Larissa Alexandre de Souza · Banco C6 S.A.</p>
+              <p class="pix-note">Seu pedido é confirmado com o pagamento do sinal. Envie a mensagem primeiro e, depois, avise na conversa quando pagar.</p>
+            </div>
+            <p class="hint">Se o WhatsApp não abriu, toque no botão abaixo.</p>
+            <a
+              class="button"
+              data-reenviar
+              href="https://wa.me/5548999442988"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                stroke-width="1.6"
                 aria-hidden="true"
               >
-                <path d="M3 5h2l2 11h11l2-8H6"/>
-                <circle cx="9" cy="20" r="1.3"/>
-                <circle cx="17" cy="20" r="1.3"/>
-              </svg>
-            </span>
-            <h1>Meu pedido</h1>
-          </div>
-          <p>Revise seus produtos, preencha seus dados e continue no WhatsApp para combinar os detalhes com a gente. A confirmação e o pagamento acontecem na conversa.</p>
-        </header>
-        <div class="cart-box" data-carrinho>
-          <div class="empty-state" data-vazio>
-            <svg
-              class="empty-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              aria-hidden="true"
-            >
-              <path d="M3 5h2l2 11h11l2-8H6"/>
-              <circle cx="9" cy="20" r="1.3"/>
-              <circle cx="17" cy="20" r="1.3"/>
-            </svg>
-            <h2>Seu pedido ainda está vazio</h2>
-            <p>O que você gostaria de encomendar?</p>
-            <nav class="category-list" aria-label="Cardápio de produtos">
-              <a class="catalog-row" href="../tortas/index.html"><span><strong>Tortas e bolos</strong><small>Escolha o sabor, o tamanho e a decoração</small></span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  aria-hidden="true"
-                >
-                  <path d="m9 5 7 7-7 7"/>
-                </svg>
-              </a>
-              <a class="catalog-row" href="../brownies/index.html"><span><strong>Brownies</strong><small>Com cobertura e marmitinha recheada</small></span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  aria-hidden="true"
-                >
-                  <path d="m9 5 7 7-7 7"/>
-                </svg>
-              </a>
-              <a class="catalog-row" href="../donuts/index.html"><span><strong>Donuts</strong><small>No copinho com 6 unidades, cobertura de chocolate e recheio na tampa</small></span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  aria-hidden="true"
-                >
-                  <path d="m9 5 7 7-7 7"/>
-                </svg>
-              </a>
-            </nav>
-          </div>
-          <ul class="cart-list" data-lista aria-label="Itens do pedido">
-          </ul>
-        </div>
+                <path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.3-4.2A8 8 0 1 1 20 11.6Z"/>
+                <path d="M9 8c-2 1 2 7 5 6l1-2-2-1-1 1-2-2 1-1-1-2Z"/>
+              </svg>Abrir pedido no WhatsApp</a>
+            <div class="thanks-actions">
+              <button type="button" class="link-button" data-editar>Voltar e editar o pedido</button>
+              <button type="button" class="link-button" data-novo>Começar um novo pedido</button>
+            </div>
+          </section>
+        </section>
         <div class="summary" data-resumo hidden>
           <div>
             <span>Total dos itens</span>
@@ -192,62 +238,6 @@
           </p>
           <button type="button" class="limpar" data-limpar>Esvaziar pedido</button>
         </div>
-        <section class="thanks" data-obrigado hidden aria-live="polite">
-          <h2 tabindex="-1">Seu pedido está pronto, <span data-obrigado-nome></span>!</h2>
-          <p>Para enviar seu pedido, confira a mensagem no WhatsApp e toque em enviar por lá. Na conversa, confirmamos a data, o horário e os detalhes do seu pedido. Seu pedido será confirmado com o pagamento do sinal.</p>
-          <div class="pix-box" data-pix data-pix-obrigado hidden>
-            <div class="pix-head">
-              <span class="pix-label">Pix para o sinal</span>
-              <span class="pix-sinal">Sinal de 50%: <strong data-pix-sinal>R$ 0,00</strong>
-              </span>
-            </div>
-            <div class="pix-key-row">
-              <code class="pix-key">cakesjlconfeitaria@gmail.com</code>
-              <button
-                type="button"
-                class="pix-copy"
-                data-copiar="cakesjlconfeitaria@gmail.com"
-                aria-label="Copiar chave Pix"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  aria-hidden="true"
-                >
-                  <rect x="9" y="9" width="11" height="11" rx="2"/>
-                  <path d="M5 15V5a1 1 0 0 1 1-1h10"/>
-                </svg>
-                <span data-copiar-texto>Copiar</span>
-              </button>
-            </div>
-            <p class="pix-meta">Chave do tipo e-mail · Larissa Alexandre de Souza · Banco C6 S.A.</p>
-            <p class="pix-note">Seu pedido é confirmado com o pagamento do sinal. Envie a mensagem primeiro e, depois, avise na conversa quando pagar.</p>
-          </div>
-          <p class="hint">Se o WhatsApp não abriu, toque no botão abaixo.</p>
-          <a
-            class="button"
-            data-reenviar
-            href="https://wa.me/5548999442988"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              aria-hidden="true"
-            >
-              <path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.3-4.2A8 8 0 1 1 20 11.6Z"/>
-              <path d="M9 8c-2 1 2 7 5 6l1-2-2-1-1 1-2-2 1-1-1-2Z"/>
-            </svg>Abrir pedido no WhatsApp</a>
-          <div class="thanks-actions">
-            <button type="button" class="link-button" data-editar>Voltar e editar o pedido</button>
-            <button type="button" class="link-button" data-novo>Começar um novo pedido</button>
-          </div>
-        </section>
         <form class="checkout" data-checkout hidden novalidate>
           <label class="field"><span>Seu nome <em class="req">obrigatório</em></span><input
               type="text"
@@ -334,87 +324,119 @@
             </pre>
           </details>
         </form>
-        <section class="conditions">
-          <h2>Como funciona</h2>
-          <dl class="conditions-list">
-            <div>
-              <dt>Antecedência</dt>
-              <dd>Pedimos pelo menos 24 horas para brownies e donuts, e 48 horas para tortas, Matilda e Bentô Cake.</dd>
-            </div>
-            <div>
-              <dt>Confirmação e pagamento</dt>
-              <dd>Para confirmar, você paga 50% do valor na encomenda e o restante na retirada. O pagamento pode ser por Pix ou cartão de crédito ou débito, por link de pagamento.</dd>
-            </div>
-            <div>
-              <dt>Retirada</dt>
-              <dd>A retirada é no bairro Bela Vista 1, em Gravatal, em uma data e horário combinados com você. Não fazemos entregas.</dd>
-            </div>
-            <div>
-              <dt>Cancelamento</dt>
-              <dd>Tortas, Matilda e Bentô Cake: pedidos cancelados com menos de 48 horas de antecedência não têm reembolso. Brownies e donuts: após a confirmação do pedido, o sinal não é devolvido.</dd>
-            </div>
-            <div>
-              <dt>Adicionais e restrições</dt>
-              <dd>O valor dos adicionais de decoração já está somado ao preço final da sua torta. Tem alguma restrição alimentar? Conte nas observações do pedido.</dd>
-            </div>
-          </dl>
+        <section class="section how-card" id="como-pedir">
+          <header class="section-heading">
+            <h2>Política de encomendas</h2>
+            <p>Informações para planejar e confirmar sua encomenda.</p>
+          </header>
+          <div class="info-grid">
+            <details>
+              <summary>Prazos e confirmação</summary>
+              <p><strong>Tortas, Matilda e Bentô Cake:</strong> pedimos pelo menos 48 horas de antecedência.</p>
+              <p><strong>Brownies e donuts:</strong> pedimos pelo menos 24 horas de antecedência. Você pode encomendar brownies a partir de 1 unidade e donuts a partir de 1 copinho com 6 mini donuts.</p>
+              <p>Para confirmar seu pedido, você paga 50% do valor na encomenda e o restante na retirada.</p>
+            </details>
+            <details>
+              <summary>Pagamento</summary>
+              <p>O valor dos adicionais de decoração já está somado ao preço final da sua torta.</p>
+              <p>Você pode pagar por Pix ou cartão de crédito ou débito. Para pagamentos com cartão, enviamos um link de pagamento.</p>
+            </details>
+            <details>
+              <summary>Retirada</summary>
+              <p>A retirada é no bairro Bela Vista 1, em Gravatal, em uma data e horário combinados com você. Não fazemos entregas.</p>
+            </details>
+            <details>
+              <summary>Conservação e transporte</summary>
+              <p>Nossos produtos são preparados artesanalmente e têm validade de até 6 dias sob refrigeração.</p>
+              <p><strong>Tortas, Matilda e Bentô Cake:</strong> não nos responsabilizamos por acidentes após a retirada do bolo.</p>
+            </details>
+            <details>
+              <summary>Pesos e rendimentos</summary>
+              <p>Os pesos e rendimentos informados são aproximados. Nos produtos servidos em fatias, a quantidade pode variar conforme a espessura do corte.</p>
+            </details>
+            <details>
+              <summary>Cancelamento</summary>
+              <p><strong>Tortas, Matilda e Bentô Cake:</strong> pedidos cancelados com menos de 48 horas de antecedência não têm reembolso. Ao fazer o pedido, você concorda com a política de troca e cancelamento.</p>
+              <p><strong>Brownies e donuts:</strong> após a confirmação do pedido, o sinal não é devolvido em caso de cancelamento.</p>
+            </details>
+            <details>
+              <summary>Dúvidas e restrições alimentares</summary>
+              <p>Antes de confirmar, fale com a gente sobre sabores, decoração ou alguma necessidade específica. Tem alguma restrição alimentar? Conte nas observações do pedido.</p>
+            </details>
+          </div>
         </section>
         <noscript>
           <p class="nojs-note">Para montar o pedido pelo site, o navegador precisa de JavaScript. Sem ele, fale com a gente pelo WhatsApp: <a href="https://wa.me/5548999442988" target="_blank" rel="noopener noreferrer">(48) 99944-2988</a>.</p>
         </noscript>
       </main>
 
-      <footer class="site-footer">
-        <nav class="social-links" aria-label="Redes sociais">
-          <a
-            href="https://www.instagram.com/cakesjlconfeitaria"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-          >
+      <footer class="site-footer footer-with-actions">
+        <div class="footer-actions">
+          <nav class="social-links" aria-label="Redes sociais">
+            <a
+              href="https://www.instagram.com/cakesjlconfeitaria"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5">
+                </rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z">
+                </path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5">
+                </line>
+              </svg>
+            </a>
+            <a
+              href="https://www.tiktok.com/@cakesjlconfeitaria"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.51a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.04z"
+                />
+              </svg>
+            </a>
+            <a
+              href="https://www.facebook.com/people/Cakes-JL-Confeitaria/61590743607528/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                />
+              </svg>
+            </a>
+          </nav>
+          <a class="cart-link" href="../pedido/index.html" data-n="0" aria-current="page">
             <svg
-              width="22"
-              height="22"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              stroke-width="1.7"
+              aria-hidden="true"
             >
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5">
-              </rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z">
-              </path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5">
-              </line>
+              <path d="M3 5h2l2 11h11l2-8H6"/>
+              <circle cx="9" cy="20" r="1.3"/>
+              <circle cx="17" cy="20" r="1.3"/>
             </svg>
+            <span>Meu pedido</span><span class="cart-link-n" data-pedido-contador>0</span>
           </a>
-          <a
-            href="https://www.tiktok.com/@cakesjlconfeitaria"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="TikTok"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.51a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.04z"
-              />
-            </svg>
-          </a>
-          <a
-            href="https://www.facebook.com/people/Cakes-JL-Confeitaria/61590743607528/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-              />
-            </svg>
-          </a>
-        </nav>
+        </div>
         <p>© Cakes JL</p>
       </footer>
     </div>
