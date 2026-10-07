@@ -30,8 +30,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=15">
-  <script src="../assets/pedido.js?v=14" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=19">
+  <script src="../assets/pedido.js?v=16" defer></script>
   </head>
   <body class="product-page pedido-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -267,13 +267,14 @@
           </div>
           <p class="aviso" data-aviso-data hidden>A data escolhida tem menos antecedência do que pedimos. Você pode enviar o pedido para consultarmos a disponibilidade. A data e o horário serão confirmados na conversa.</p>
           <div class="field">
-            <span>Pagamento do sinal (50%)</span>
-            <div class="choice-grid two">
-              <label><input type="radio" name="pagamento" value="Pix" checked><span>Pix</span>
+            <span id="pagamento-rotulo">Pagamento do sinal (50%) <em class="req">obrigatório</em></span>
+            <div class="choice-grid two" role="radiogroup" aria-labelledby="pagamento-rotulo" aria-required="true">
+              <label><input type="radio" name="pagamento" value="Pix" required aria-describedby="erro-pagamento"><span>Pix</span>
               </label>
-              <label><input type="radio" name="pagamento" value="Cartão (link de pagamento)"><span>Cartão<small>link de pagamento</small></span>
+              <label><input type="radio" name="pagamento" value="Cartão (link de pagamento)" required aria-describedby="erro-pagamento"><span>Cartão<small>link de pagamento</small></span>
               </label>
             </div>
+            <small class="field-error" id="erro-pagamento" data-erro="pagamento" hidden></small>
             <div class="pix-box" data-pix hidden>
               <div class="pix-head">
                 <span class="pix-label">Pix para o sinal</span>
@@ -306,12 +307,15 @@
             </div>
             <p class="pay-note" data-cartao-nota hidden>Enviamos o link de pagamento pelo WhatsApp.</p>
           </div>
-          <label class="field"><span>Observações e restrições alimentares (opcional)</span><textarea
-              name="obs"
-              maxlength="300"
-              placeholder="Alergias, preferências ou outros detalhes que precisamos saber"
-            ></textarea>
-          </label>
+          <div class="optional-group" role="group" aria-label="Observações e restrições alimentares, opcional">
+            <div class="optional-heading"><strong>Se quiser, conte mais</strong><span>opcional</span></div>
+            <label class="field"><span>Observações e restrições alimentares</span><textarea
+                name="obs"
+                maxlength="300"
+                placeholder="Alergias, preferências ou outros detalhes que precisamos saber"
+              ></textarea>
+            </label>
+          </div>
           <button class="button" type="submit">
             <svg
               viewBox="0 0 24 24"

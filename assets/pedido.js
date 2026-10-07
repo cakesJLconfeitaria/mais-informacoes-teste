@@ -793,8 +793,7 @@
         });
         grade.appendChild(l);
       });
-      if (dica) dica.textContent = base +
-        (opcoes.length === 1 ? ' Neste sabor, há apenas chantilly.' : '');
+      if (dica) dica.textContent = base;
       if (form._resumoCobertura) form._resumoCobertura();
     }
     form.addEventListener('change', function (event) {
@@ -851,7 +850,7 @@
 
   /* Faixa "Preço final" (04/10/2026): valor unitário × quantidade e uma linha de
      detalhe ("2× tamanho M · 2 adicionais"). unit == null mostra "Valor a combinar". */
-  function mostrarPrevia(form, unit, detalhe) {
+  function mostrarPrevia(form, unit, detalhe, pendencia) {
     var el = form.querySelector('[data-previa]');
     if (!el) return;
     var valor = el.querySelector('[data-previa-valor]');
@@ -860,7 +859,7 @@
     var prefixo = q > 1 ? q + '× ' : '';
     if (unit == null) {
       el.classList.add('is-open');
-      if (valor) valor.textContent = 'Valor a combinar';
+      if (valor) valor.textContent = pendencia || 'Valor a combinar';
     } else {
       el.classList.remove('is-open');
       if (valor) valor.textContent = moeda(unit * q);
@@ -871,9 +870,41 @@
     if (!lista || !lista.length) return '';
     return ' · ' + lista.length + (lista.length === 1 ? ' adicional' : ' adicionais') + ' (+ ' + moeda(somaExtras(lista)) + ')';
   }
+  function ligarEscolhaObrigatoria(form, nome, mensagem) {
+    var radios = form.querySelectorAll('[name=' + nome + ']');
+    if (!radios.length) return null;
+    var campo = radios[0].closest('.field');
+    var grade = campo.querySelector('.size-grid, .bento-options');
+    var erro = document.createElement('small');
+    erro.className = 'field-error js-only';
+    erro.id = 'erro-' + nome + '-' + Array.prototype.indexOf.call(document.querySelectorAll('form[data-produto]'), form);
+    erro.textContent = mensagem;
+    erro.hidden = true;
+    campo.appendChild(erro);
+    grade.setAttribute('role', 'radiogroup');
+    grade.setAttribute('aria-label', nome === 'tamanho' ? 'Tamanho' : 'Opção do Bentô Cake');
+    grade.setAttribute('aria-required', 'true');
+    radios.forEach(function (r) {
+      r.setAttribute('aria-describedby', erro.id);
+      r.addEventListener('change', function () {
+        erro.hidden = true;
+        radios.forEach(function (opcao) { opcao.removeAttribute('aria-invalid'); });
+      });
+    });
+    return function () {
+      if (form.querySelector('[name=' + nome + ']:checked')) return true;
+      erro.hidden = false;
+      radios.forEach(function (r) { r.setAttribute('aria-invalid', 'true'); });
+      campo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      radios[0].focus({ preventScroll: true });
+      return false;
+    };
+  }
   function ligarFormulario(form) {
     var qtd = form.querySelector('[name=qtd]');
     var tipo = form.dataset.produto;
+    var tamanhoOk = ligarEscolhaObrigatoria(form, 'tamanho', 'Escolha o tamanho antes de adicionar ao pedido.');
+    var opcaoOk = ligarEscolhaObrigatoria(form, 'opcao', 'Escolha uma opção de Bentô Cake antes de adicionar ao pedido.');
     var aoMudarQtd = function () {
       if (form._atualizarPrevia) form._atualizarPrevia();
     };
@@ -922,8 +953,9 @@
           c.hidden = !(sabor && sabor.value === c.dataset.para);
         });
         var extras = form._adicionais || [];
-        var detalhe = (tam ? 'tamanho ' + tam.value : '') + textoAdicionais(extras);
-        if (!linhaT || !TORTA.linhas[linhaT] || !tam) mostrarPrevia(form, null, detalhe);
+        var detalhe = (tam ? 'tamanho ' + tam.value : 'Escolha o tamanho') + textoAdicionais(extras);
+        if (!tam) mostrarPrevia(form, null, detalhe, 'Selecione o tamanho');
+        else if (!linhaT || !TORTA.linhas[linhaT]) mostrarPrevia(form, null, detalhe);
         else mostrarPrevia(form, TORTA.linhas[linhaT][tam.value] + somaExtras(extras), detalhe);
       };
       form.querySelectorAll('[name=tamanho],[name=sabor]').forEach(function (r) {
@@ -939,7 +971,10 @@
       form._atualizarPrevia = function () {
         var op = form.querySelector('[name=opcao]:checked');
         var sb = form.querySelector('[name=sabor]:checked');
-        if (!op) return;
+        if (!op) {
+          mostrarPrevia(form, null, '', 'Selecione uma opção');
+          return;
+        }
         var geleia = sb && sb.value === 'Ninho com geleia de morango';
         mostrarPrevia(
           form,
@@ -954,7 +989,9 @@
     }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
+      if (opcaoOk && !opcaoOk()) return;
       if (form._saborOk && !form._saborOk()) return;
+      if (tamanhoOk && !tamanhoOk()) return;
       if (form._coberturaOk && !form._coberturaOk()) return; // cobertura obrigatória nas tortas e no Bentô (06/10/2026)
       var item = montarItem(form);
       var itens = lerPedido();
@@ -1040,8 +1077,9 @@
         el.textContent = msg || '';
         el.hidden = !msg;
       }
-      var input = form.querySelector('[name=' + campo + ']');
-      if (input) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      form.querySelectorAll('[name=' + campo + ']').forEach(function (input) {
+        input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      });
     }
     function render() {
       var itens = lerPedido();
@@ -1119,7 +1157,8 @@
       var pag = form.querySelector('[name=pagamento]:checked');
       var ehPix = !!pag && pag.value === 'Pix';
       if (pixCheckout) pixCheckout.hidden = !ehPix;
-      if (cartaoNota) cartaoNota.hidden = ehPix;
+      if (cartaoNota) cartaoNota.hidden = !pag || ehPix;
+      if (pag) mostrarErro('pagamento', '');
     }
     form.querySelectorAll('[name=pagamento]').forEach(function (r) {
       r.addEventListener('change', atualizarPagamento);
@@ -1134,7 +1173,7 @@
       var itens = lerPedido();
       if (!itens.length) return;
       var nome = nomeEl.value.trim();
-      // nome, data e horário de retirada são obrigatórios (horário desde 04/10/2026); o primeiro campo com erro recebe o foco
+      // Nome, retirada e pagamento são obrigatórios; o primeiro campo com erro recebe o foco.
       var primeiroErro = null;
       function exigir(campo, el, valido, msg) {
         mostrarErro(campo, valido ? '' : msg);
@@ -1143,11 +1182,12 @@
       exigir('nome', nomeEl, nome.length >= 2, 'Informe seu nome para continuar.');
       exigir('data', dataEl, !!dataEl.value, 'Escolha o dia em que gostaria de retirar.');
       exigir('hora', horaEl, !!horaEl.value, 'Informe o horário em que gostaria de retirar.');
+      var pag = form.querySelector('[name=pagamento]:checked');
+      exigir('pagamento', form.querySelector('[name=pagamento]'), !!pag, 'Escolha a forma de pagamento para continuar.');
       if (primeiroErro) {
         primeiroErro.focus();
         return;
       }
-      var pag = form.querySelector('[name=pagamento]:checked');
       var dados = {
         nome: nome,
         data: formatarData(dataEl.value),

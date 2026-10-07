@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=15">
-  <script src="../assets/pedido.js?v=14" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=19">
+  <script src="../assets/pedido.js?v=16" defer></script>
   </head>
   <body class="product-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -156,13 +156,13 @@
                   </div>
                 </div>
                 <div class="field">
-                  <span class="field-label">Tamanho</span>
+                  <span class="field-label">Tamanho <em class="req">obrigatório</em></span>
                   <div class="size-grid">
-                    <label class="size-card"><input type="radio" name="tamanho" value="P" checked><span class="size-symbol">P</span><span class="size-info">Aro 15 · 12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price">R$ 159,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="P"><span class="size-symbol">P</span><span class="size-info">Aro 15<br>12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price">R$ 159,00</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20 · 24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price">R$ 230,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20<br>24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price">R$ 230,00</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25 · 40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price">R$ 320,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25<br>40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price">R$ 320,00</span>
                     </label>
                   </div>
                 </div>
@@ -174,36 +174,38 @@
                   </div>
                   <small class="field-error" data-cobertura-erro hidden>Escolha a cobertura.</small>
                 </div>
-                <div class="field js-only addons-field">
-                  <span class="field-label">Adicionais e decoração <em class="req">opcional</em>
-                  </span>
-                  <button
-                    type="button"
-                    class="addons-trigger"
-                    data-addons-open
-                    aria-haspopup="dialog"
-                  ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      aria-hidden="true"
-                    >
-                      <path d="m9 5 7 7-7 7"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="field js-only">
-                  <label for="tc-deco">Como você imagina sua torta? <em class="req">opcional</em>
-                  </label>
-                  <textarea
-                    id="tc-deco"
-                    name="decoracao"
-                    maxlength="300"
-                    placeholder="Tema, cores, frase no topo ou outros detalhes"
-                  >
-                  </textarea>
+                <div class="optional-group js-only" role="group" aria-label="Personalize se quiser, opcional">
+                  <div class="optional-heading"><strong>Personalize se quiser</strong><span>opcional</span></div>
+                  <div class="field js-only addons-field">
+                    <span class="field-label">Adicionais e decoração
+                    </span>
+                    <button
+                      type="button"
+                      class="addons-trigger"
+                      data-addons-open
+                      aria-haspopup="dialog"
+                    ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                      >
+                        <path d="m9 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="field js-only">
+                    <label for="tc-deco">Como você imagina sua torta?
+                    </label>
+                    <textarea
+                      id="tc-deco"
+                      name="decoracao"
+                      maxlength="300"
+                      placeholder="Tema, cores, frase no topo ou outros detalhes"
+                    ></textarea>
+                  </div>
                 </div>
                 <div class="price-panel js-only">
                   <div class="qty-row">
@@ -319,13 +321,13 @@
                   </div>
                 </div>
                 <div class="field">
-                  <span class="field-label">Tamanho</span>
+                  <span class="field-label">Tamanho <em class="req">obrigatório</em></span>
                   <div class="size-grid">
-                    <label class="size-card"><input type="radio" name="tamanho" value="P" checked><span class="size-symbol">P</span><span class="size-info">Aro 15 · 12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price">R$ 170,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="P"><span class="size-symbol">P</span><span class="size-info">Aro 15<br>12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price">R$ 170,00</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20 · 24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price">R$ 270,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20<br>24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price">R$ 270,00</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25 · 40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price">R$ 360,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25<br>40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price">R$ 360,00</span>
                     </label>
                   </div>
                 </div>
@@ -337,36 +339,38 @@
                   </div>
                   <small class="field-error" data-cobertura-erro hidden>Escolha a cobertura.</small>
                 </div>
-                <div class="field js-only addons-field">
-                  <span class="field-label">Adicionais e decoração <em class="req">opcional</em>
-                  </span>
-                  <button
-                    type="button"
-                    class="addons-trigger"
-                    data-addons-open
-                    aria-haspopup="dialog"
-                  ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      aria-hidden="true"
-                    >
-                      <path d="m9 5 7 7-7 7"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="field js-only">
-                  <label for="te-deco">Como você imagina sua torta? <em class="req">opcional</em>
-                  </label>
-                  <textarea
-                    id="te-deco"
-                    name="decoracao"
-                    maxlength="300"
-                    placeholder="Tema, cores, frase no topo ou outros detalhes"
-                  >
-                  </textarea>
+                <div class="optional-group js-only" role="group" aria-label="Personalize se quiser, opcional">
+                  <div class="optional-heading"><strong>Personalize se quiser</strong><span>opcional</span></div>
+                  <div class="field js-only addons-field">
+                    <span class="field-label">Adicionais e decoração
+                    </span>
+                    <button
+                      type="button"
+                      class="addons-trigger"
+                      data-addons-open
+                      aria-haspopup="dialog"
+                    ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                      >
+                        <path d="m9 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="field js-only">
+                    <label for="te-deco">Como você imagina sua torta?
+                    </label>
+                    <textarea
+                      id="te-deco"
+                      name="decoracao"
+                      maxlength="300"
+                      placeholder="Tema, cores, frase no topo ou outros detalhes"
+                    ></textarea>
+                  </div>
                 </div>
                 <div class="price-panel js-only">
                   <div class="qty-row">
@@ -476,13 +480,13 @@
                   </div>
                 </div>
                 <div class="field">
-                  <span class="field-label">Tamanho</span>
+                  <span class="field-label">Tamanho <em class="req">obrigatório</em></span>
                   <div class="size-grid">
-                    <label class="size-card"><input type="radio" name="tamanho" value="P" checked><span class="size-symbol">P</span><span class="size-info">Aro 15 · 12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price">R$ 200,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="P"><span class="size-symbol">P</span><span class="size-info">Aro 15<br>12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price">R$ 200,00</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20 · 24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price">R$ 300,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20<br>24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price">R$ 300,00</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25 · 40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price">R$ 420,00</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25<br>40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price">R$ 420,00</span>
                     </label>
                   </div>
                 </div>
@@ -494,36 +498,38 @@
                   </div>
                   <small class="field-error" data-cobertura-erro hidden>Escolha a cobertura.</small>
                 </div>
-                <div class="field js-only addons-field">
-                  <span class="field-label">Adicionais e decoração <em class="req">opcional</em>
-                  </span>
-                  <button
-                    type="button"
-                    class="addons-trigger"
-                    data-addons-open
-                    aria-haspopup="dialog"
-                  ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      aria-hidden="true"
-                    >
-                      <path d="m9 5 7 7-7 7"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="field js-only">
-                  <label for="tp-deco">Como você imagina sua torta? <em class="req">opcional</em>
-                  </label>
-                  <textarea
-                    id="tp-deco"
-                    name="decoracao"
-                    maxlength="300"
-                    placeholder="Tema, cores, frase no topo ou outros detalhes"
-                  >
-                  </textarea>
+                <div class="optional-group js-only" role="group" aria-label="Personalize se quiser, opcional">
+                  <div class="optional-heading"><strong>Personalize se quiser</strong><span>opcional</span></div>
+                  <div class="field js-only addons-field">
+                    <span class="field-label">Adicionais e decoração
+                    </span>
+                    <button
+                      type="button"
+                      class="addons-trigger"
+                      data-addons-open
+                      aria-haspopup="dialog"
+                    ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                      >
+                        <path d="m9 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="field js-only">
+                    <label for="tp-deco">Como você imagina sua torta?
+                    </label>
+                    <textarea
+                      id="tp-deco"
+                      name="decoracao"
+                      maxlength="300"
+                      placeholder="Tema, cores, frase no topo ou outros detalhes"
+                    ></textarea>
+                  </div>
                 </div>
                 <div class="price-panel js-only">
                   <div class="qty-row">
@@ -607,13 +613,13 @@
                   >
                 </div>
                 <div class="field">
-                  <span class="field-label">Tamanho</span>
+                  <span class="field-label">Tamanho <em class="req">obrigatório</em></span>
                   <div class="size-grid">
-                    <label class="size-card"><input type="radio" name="tamanho" value="P" checked><span class="size-symbol">P</span><span class="size-info">Aro 15 · 12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price size-price-open">a combinar</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="P"><span class="size-symbol">P</span><span class="size-info">Aro 15<br>12 fatias</span><span class="size-weight">1,0 a 1,5 kg</span><span class="size-price size-price-open">a combinar</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20 · 24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price size-price-open">a combinar</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="M"><span class="size-symbol">M</span><span class="size-info">Aro 20<br>24 fatias</span><span class="size-weight">2,5 a 3,0 kg</span><span class="size-price size-price-open">a combinar</span>
                     </label>
-                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25 · 40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price size-price-open">a combinar</span>
+                    <label class="size-card"><input type="radio" name="tamanho" value="G"><span class="size-symbol">G</span><span class="size-info">Aro 25<br>40 fatias</span><span class="size-weight">3,5 a 4,0 kg</span><span class="size-price size-price-open">a combinar</span>
                     </label>
                   </div>
                 </div>
@@ -629,36 +635,38 @@
                   </div>
                   <small class="field-error" data-cobertura-erro hidden>Escolha a cobertura.</small>
                 </div>
-                <div class="field js-only addons-field">
-                  <span class="field-label">Adicionais e decoração <em class="req">opcional</em>
-                  </span>
-                  <button
-                    type="button"
-                    class="addons-trigger"
-                    data-addons-open
-                    aria-haspopup="dialog"
-                  ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      aria-hidden="true"
-                    >
-                      <path d="m9 5 7 7-7 7"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="field js-only">
-                  <label for="to-deco">Como você imagina sua torta? <em class="req">opcional</em>
-                  </label>
-                  <textarea
-                    id="to-deco"
-                    name="decoracao"
-                    maxlength="300"
-                    placeholder="Tema, cores, frase no topo ou outros detalhes"
-                  >
-                  </textarea>
+                <div class="optional-group js-only" role="group" aria-label="Personalize se quiser, opcional">
+                  <div class="optional-heading"><strong>Personalize se quiser</strong><span>opcional</span></div>
+                  <div class="field js-only addons-field">
+                    <span class="field-label">Adicionais e decoração
+                    </span>
+                    <button
+                      type="button"
+                      class="addons-trigger"
+                      data-addons-open
+                      aria-haspopup="dialog"
+                    ><span class="addons-summary" data-addons-summary><strong>Nenhum adicional escolhido</strong><small>Veja as 13 opções com foto</small></span><span class="addons-action" data-addons-action>Ver opções</span>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                      >
+                        <path d="m9 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="field js-only">
+                    <label for="to-deco">Como você imagina sua torta?
+                    </label>
+                    <textarea
+                      id="to-deco"
+                      name="decoracao"
+                      maxlength="300"
+                      placeholder="Tema, cores, frase no topo ou outros detalhes"
+                    ></textarea>
+                  </div>
                 </div>
                 <div class="price-panel js-only">
                   <div class="qty-row">
@@ -717,11 +725,10 @@
               </noscript>
             </article>
           </div>
-          <p class="note">Pesos e rendimentos aproximados. A quantidade de fatias varia conforme a espessura do corte.</p>
         </section>
         <section class="section" id="especiais">
-          <header class="section-heading">
-            <h2>Matilda e Bentô Cake</h2>
+          <header class="section-heading section-divider">
+            <h2>Outras opções</h2>
           </header>
           <div class="special-grid">
             <article class="special-card has-carousel" aria-labelledby="matilda-titulo">
@@ -824,7 +831,7 @@
                 aria-label="Adicionar Bentô Cake ao pedido"
               >
                 <div class="field">
-                  <span class="field-label">Opção</span>
+                  <span class="field-label">Opção <em class="req">obrigatório</em></span>
                   <div class="bento-options">
                     <div class="bento-option">
                       <a
@@ -841,7 +848,7 @@
                           decoding="async"
                         >
                       </a>
-                      <label class="bento-pick"><input type="radio" name="opcao" value="flork" checked><span class="bento-text">Flork com escrita, somente escrita ou pequenos desenhos em preto</span><strong>R$ 70,00</strong><span class="pick-dot" aria-hidden="true"></span>
+                      <label class="bento-pick"><input type="radio" name="opcao" value="flork"><span class="bento-text">Flork com escrita, somente escrita ou pequenos desenhos em preto</span><strong>R$ 70,00</strong><span class="pick-dot" aria-hidden="true"></span>
                       </label>
                     </div>
                     <div class="bento-option">
@@ -895,16 +902,19 @@
                   </div>
                   <small class="field-error" data-cobertura-erro hidden>Escolha a cobertura.</small>
                 </div>
-                <div class="field js-only">
-                  <label for="bt-escrita">Qual frase ou desenho você gostaria? <em class="req">opcional</em>
-                  </label>
-                  <input
-                    type="text"
-                    id="bt-escrita"
-                    name="escrita"
-                    maxlength="120"
-                    placeholder="Ex.: Parabéns, Ana!"
-                  >
+                <div class="optional-group js-only" role="group" aria-label="Personalize se quiser, opcional">
+                  <div class="optional-heading"><strong>Personalize se quiser</strong><span>opcional</span></div>
+                  <div class="field js-only">
+                    <label for="bt-escrita">Qual frase ou desenho você gostaria?
+                    </label>
+                    <input
+                      type="text"
+                      id="bt-escrita"
+                      name="escrita"
+                      maxlength="120"
+                      placeholder="Ex.: Parabéns, Ana!"
+                    >
+                  </div>
                 </div>
                 <div class="price-panel js-only">
                   <div class="qty-row">
@@ -1254,13 +1264,15 @@
         </section>
         <section class="section how-card" id="como-pedir">
           <header class="section-heading">
-            <h2>Como encomendar</h2>
-            <p>Condições para tortas, Matilda e Bentô Cake.</p>
+            <h2>Política de encomendas</h2>
+            <p>Informações para planejar e confirmar sua encomenda.</p>
           </header>
           <div class="info-grid">
             <details open>
-              <summary>Antecedência e confirmação</summary>
-              <p>Pedimos pelo menos 48 horas de antecedência. Para confirmar seu pedido, você paga 50% do valor na encomenda e o restante na retirada.</p>
+              <summary>Prazos e confirmação</summary>
+              <p><strong>Tortas, Matilda e Bentô Cake:</strong> pedimos pelo menos 48 horas de antecedência.</p>
+              <p><strong>Brownies e donuts:</strong> pedimos pelo menos 24 horas de antecedência. Você pode encomendar brownies a partir de 1 unidade e donuts a partir de 1 copinho com 6 mini donuts.</p>
+              <p>Para confirmar seu pedido, você paga 50% do valor na encomenda e o restante na retirada.</p>
             </details>
             <details>
               <summary>Pagamento</summary>
@@ -1271,15 +1283,21 @@
               <p>A retirada é no bairro Bela Vista 1, em Gravatal, em uma data e horário combinados com você. Não fazemos entregas.</p>
             </details>
             <details>
-              <summary>Armazenamento e transporte</summary>
-              <p>Nossos produtos são preparados artesanalmente e têm validade de até 6 dias sob refrigeração. Não nos responsabilizamos por acidentes após a retirada do bolo.</p>
+              <summary>Conservação e transporte</summary>
+              <p>Nossos produtos são preparados artesanalmente e têm validade de até 6 dias sob refrigeração.</p>
+              <p><strong>Tortas, Matilda e Bentô Cake:</strong> não nos responsabilizamos por acidentes após a retirada do bolo.</p>
+            </details>
+            <details>
+              <summary>Pesos e rendimentos</summary>
+              <p>Os pesos e rendimentos informados são aproximados. Nos produtos servidos em fatias, a quantidade pode variar conforme a espessura do corte.</p>
             </details>
             <details>
               <summary>Cancelamento</summary>
-              <p>Pedidos cancelados com menos de 48 horas de antecedência não têm reembolso. Ao fazer o pedido, você concorda com a política de troca e cancelamento.</p>
+              <p><strong>Tortas, Matilda e Bentô Cake:</strong> pedidos cancelados com menos de 48 horas de antecedência não têm reembolso. Ao fazer o pedido, você concorda com a política de troca e cancelamento.</p>
+              <p><strong>Brownies e donuts:</strong> após a confirmação do pedido, o sinal não é devolvido em caso de cancelamento.</p>
             </details>
             <details>
-              <summary>Dúvidas sobre a encomenda</summary>
+              <summary>Dúvidas e restrições alimentares</summary>
               <p>Antes de confirmar, fale com a gente sobre sabores, decoração ou alguma necessidade específica. Tem alguma restrição alimentar? Conte nas observações do pedido.</p>
             </details>
           </div>
