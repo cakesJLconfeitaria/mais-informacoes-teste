@@ -1365,6 +1365,37 @@ html:not(.js) .js-only {
   color: #ffb4ab
 }
 
+/* Retirada fora do prazo: bloqueio com destaque, além da indicação por cor. */
+.aviso-retirada {
+  padding: 16px;
+  border: 1px solid #d88a83;
+  border-left: 5px solid #b3261e;
+  background: #fff0ee;
+  color: #84221d;
+  font-size: 13px;
+  line-height: 1.55
+}
+
+.aviso-retirada strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px
+}
+
+[data-theme=dark] .aviso-retirada {
+  border-color: #dc928b;
+  background: #4a272b;
+  color: #ffd8d3
+}
+
+.checkout input[type=date],.checkout input[type=time] {
+  cursor: pointer
+}
+
+[data-theme=dark] .checkout input[aria-invalid=true] {
+  border-color: #ffb4ab
+}
+
 .checkout input[aria-invalid=true] {
   border-color: #b3261e
 }
@@ -1831,6 +1862,40 @@ body.lightbox-open {
 
 [data-theme=dark] .pick-box::after {
   border-color: #321820
+}
+
+/* Acetato com laço: primeira opção, gratuita, com destaque nos dois temas. */
+.addon-free {
+  --free-bg: #eff9f1;
+  --free-border: #a6d4b2;
+  --free-ink: #24653a;
+  --free-badge: #d8efdf;
+  padding: 10px;
+  margin-bottom: 4px;
+  border: 1px solid var(--free-border);
+  border-radius: 12px;
+  background: var(--free-bg)
+}
+
+[data-theme=dark] .addon-free {
+  --free-bg: #203b2b;
+  --free-border: #477d59;
+  --free-ink: #c0efcc;
+  --free-badge: #30563d
+}
+
+.addon-free .addon-pick:hover,.addon-free .addon-pick:has(input:checked) {
+  background: var(--free-badge)
+}
+
+.addon-free .addon-free-badge {
+  justify-self: start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--free-badge);
+  color: var(--free-ink);
+  font-size: 11px;
+  font-weight: 700
 }
 
 .addons-foot {
@@ -3132,7 +3197,28 @@ html.js .nojs-only {
   margin-top: 0;
   padding: 0;
   border: 0;
-  background: transparent
+  background: transparent;
+  gap: 8px
+}
+
+/* P63: dados do Pix compactos apenas na tela final. */
+.thanks .pix-box {
+  gap: 6px;
+  margin-top: 0;
+  padding: 10px 12px
+}
+
+.thanks .pix-key {
+  padding: 8px 10px
+}
+
+.thanks .pix-meta {
+  font-size: 11px;
+  line-height: 1.45
+}
+
+.thanks-actions {
+  gap: 6px 14px
 }
 
 
@@ -3154,6 +3240,11 @@ html.js .nojs-only {
   align-items: center;
   justify-content: space-between;
   gap: 12px
+}
+
+/* P56 (08/10/2026): grupo centralizado somente nas três páginas de produtos. */
+.product-page:not(.pedido-page) .footer-actions {
+  justify-content: center
 }
 
 .footer-actions .social-links {

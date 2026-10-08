@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=21">
-  <script src="../assets/pedido.js?v=16" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=23">
+  <script src="../assets/pedido.js?v=21" defer></script>
   </head>
   <body class="product-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -985,7 +985,7 @@
             <header class="addons-head">
               <div>
                 <h2 id="adicionais-titulo">Adicionais e decoração</h2>
-                <p>Escolha os adicionais que deseja para sua torta. O valor de cada um é somado ao preço final.</p>
+                <p>Escolha os adicionais que deseja para sua torta</p>
               </div>
               <button
                 type="button"
@@ -1005,6 +1005,24 @@
               </button>
             </header>
             <div class="addons-list">
+              <div class="addon addon-free">
+                <a
+                  class="thumb thumb-sm"
+                  href="adicional-9.1.jpg"
+                  data-title="Acetato com laço"
+                  data-price="Grátis"
+                ><img
+                    src="adicional-9.1.jpg"
+                    alt="Bolo com acetato e laço"
+                    width="480"
+                    height="640"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                </a>
+                <label class="addon-pick"><input type="checkbox" name="adicional" value="Acetato com laço" data-preco="0"><span class="addon-text"><strong>Acetato com laço</strong><small class="addon-free-badge">Grátis</small></span><span class="pick-box" aria-hidden="true"></span>
+                </label>
+              </div>
               <div class="addon">
                 <a
                   class="thumb thumb-sm"
@@ -1175,24 +1193,6 @@
               <div class="addon">
                 <a
                   class="thumb thumb-sm"
-                  href="adicional-9.1.jpg"
-                  data-title="Acetato com laço"
-                  data-price="R$ 10,00"
-                ><img
-                    src="adicional-9.1.jpg"
-                    alt="Bolo com acetato e laço"
-                    width="480"
-                    height="640"
-                    loading="lazy"
-                    decoding="async"
-                  >
-                </a>
-                <label class="addon-pick"><input type="checkbox" name="adicional" value="Acetato com laço" data-preco="10"><span class="addon-text"><strong>Acetato com laço</strong><small>R$ 10,00</small></span><span class="pick-box" aria-hidden="true"></span>
-                </label>
-              </div>
-              <div class="addon">
-                <a
-                  class="thumb thumb-sm"
                   href="adicional-10.1.jpg"
                   data-title="Metalizado ou glitter"
                   data-price="R$ 15,00"
@@ -1255,7 +1255,7 @@
                 </label>
               </div>
             </div>
-            <p class="note">Os adicionais escolhidos são somados ao preço final da torta. Se quiser combinar algo diferente, conte no campo de observações ou fale com a gente pelo WhatsApp.</p>
+            <p class="note">Se quiser combinar algo diferente, conte no campo de observações ou fale com a gente pelo WhatsApp.</p>
             <footer class="addons-foot js-only">
               <button type="button" class="button" data-addons-done>Concluir</button>
               <button type="button" class="link-button" data-addons-none>Não quero adicionais</button>
@@ -1276,7 +1276,7 @@
             </details>
             <details>
               <summary>Pagamento</summary>
-              <p>O valor dos adicionais de decoração já está somado ao preço final da sua torta.</p>
+              <p>Os adicionais pagos de decoração já estão incluídos no preço final da sua torta.</p>
               <p>Você pode pagar por Pix ou cartão de crédito ou débito. Para pagamentos com cartão, enviamos um link de pagamento.</p>
             </details>
             <details>

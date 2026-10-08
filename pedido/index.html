@@ -30,8 +30,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=21">
-  <script src="../assets/pedido.js?v=16" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=25">
+  <script src="../assets/pedido.js?v=21" defer></script>
   </head>
   <body class="product-page pedido-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -169,7 +169,24 @@
           </div>
           <section class="thanks" data-obrigado hidden aria-live="polite">
             <h2 tabindex="-1">Seu pedido está pronto, <span data-obrigado-nome></span>!</h2>
-            <p>Para enviar seu pedido, confira a mensagem no WhatsApp e toque em enviar por lá. Na conversa, confirmamos a data, o horário e os detalhes do seu pedido. Seu pedido será confirmado com o pagamento do sinal.</p>
+            <p>Confira e envie a mensagem no WhatsApp. Por lá, confirmamos a retirada e os detalhes. O pedido é confirmado com o pagamento do sinal.</p>
+            <a
+              class="button"
+              data-reenviar
+              href="https://wa.me/5548999442988"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                aria-hidden="true"
+              >
+                <path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.3-4.2A8 8 0 1 1 20 11.6Z"/>
+                <path d="M9 8c-2 1 2 7 5 6l1-2-2-1-1 1-2-2 1-1-1-2Z"/>
+              </svg>Abrir pedido no WhatsApp</a>
             <div class="pix-box" data-pix data-pix-obrigado hidden>
               <div class="pix-head">
                 <span class="pix-label">Pix para o sinal</span>
@@ -198,26 +215,7 @@
                 </button>
               </div>
               <p class="pix-meta">Chave do tipo e-mail · Larissa Alexandre de Souza · Banco C6 S.A.</p>
-              <p class="pix-note">Seu pedido é confirmado com o pagamento do sinal. Envie a mensagem primeiro e, depois, avise na conversa quando pagar.</p>
             </div>
-            <p class="hint">Se o WhatsApp não abriu, toque no botão abaixo.</p>
-            <a
-              class="button"
-              data-reenviar
-              href="https://wa.me/5548999442988"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.6"
-                aria-hidden="true"
-              >
-                <path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.3-4.2A8 8 0 1 1 20 11.6Z"/>
-                <path d="M9 8c-2 1 2 7 5 6l1-2-2-1-1 1-2-2 1-1-1-2Z"/>
-              </svg>Abrir pedido no WhatsApp</a>
             <div class="thanks-actions">
               <button type="button" class="link-button" data-editar>Voltar e editar o pedido</button>
               <button type="button" class="link-button" data-novo>Começar um novo pedido</button>
@@ -250,12 +248,15 @@
             ><small class="field-error" id="erro-nome" data-erro="nome" hidden></small>
           </label>
           <div class="two-cols">
-            <label class="field"><span>Data de retirada <em class="req">obrigatório</em></span><input type="date" name="data" required aria-describedby="erro-data"><small class="field-error" id="erro-data" data-erro="data" hidden></small>
+            <label class="field"><span>Data de retirada <em class="req">obrigatório</em></span><input type="date" name="data" required aria-describedby="erro-data aviso-retirada"><small class="field-error" id="erro-data" data-erro="data" hidden></small>
             </label>
-            <label class="field"><span>Horário de retirada <em class="req">obrigatório</em></span><input type="time" name="hora" required aria-describedby="erro-hora"><small class="field-error" id="erro-hora" data-erro="hora" hidden></small>
+            <label class="field"><span>Horário de retirada <em class="req">obrigatório</em></span><input type="time" name="hora" required aria-describedby="erro-hora aviso-retirada"><small class="field-error" id="erro-hora" data-erro="hora" hidden></small>
             </label>
           </div>
-          <p class="aviso" data-aviso-data hidden>A data escolhida tem menos antecedência do que pedimos. Você pode enviar o pedido para consultarmos a disponibilidade. A data e o horário serão confirmados na conversa.</p>
+          <div class="aviso aviso-retirada" id="aviso-retirada" data-aviso-data role="alert" hidden>
+            <strong data-aviso-titulo></strong>
+            <p data-aviso-texto></p>
+          </div>
           <div class="field">
             <span id="pagamento-rotulo">Pagamento do sinal (50%) <em class="req">obrigatório</em></span>
             <div class="choice-grid two" role="radiogroup" aria-labelledby="pagamento-rotulo" aria-required="true">
@@ -316,7 +317,7 @@
             >
               <path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.3-4.2A8 8 0 1 1 20 11.6Z"/>
               <path d="M9 8c-2 1 2 7 5 6l1-2-2-1-1 1-2-2 1-1-1-2Z"/>
-            </svg>Continuar no WhatsApp</button>
+            </svg>Enviar seu pedido no WhatsApp</button>
           <p class="hint prazo">O botão abre uma mensagem pronta. Confira e toque em enviar no WhatsApp.</p>
           <details class="message-preview" hidden>
             <summary>Ver a mensagem que será enviada</summary>
@@ -338,7 +339,7 @@
             </details>
             <details>
               <summary>Pagamento</summary>
-              <p>O valor dos adicionais de decoração já está somado ao preço final da sua torta.</p>
+              <p>Os adicionais pagos de decoração já estão incluídos no preço final da sua torta.</p>
               <p>Você pode pagar por Pix ou cartão de crédito ou débito. Para pagamentos com cartão, enviamos um link de pagamento.</p>
             </details>
             <details>
@@ -422,20 +423,6 @@
               </svg>
             </a>
           </nav>
-          <a class="cart-link" href="../pedido/index.html" data-n="0" aria-current="page">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.7"
-              aria-hidden="true"
-            >
-              <path d="M3 5h2l2 11h11l2-8H6"/>
-              <circle cx="9" cy="20" r="1.3"/>
-              <circle cx="17" cy="20" r="1.3"/>
-            </svg>
-            <span>Meu pedido</span><span class="cart-link-n" data-pedido-contador>0</span>
-          </a>
         </div>
         <p>© Cakes JL</p>
       </footer>

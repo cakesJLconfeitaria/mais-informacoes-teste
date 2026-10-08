@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=21">
-  <script src="../assets/pedido.js?v=16" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=22">
+  <script src="../assets/pedido.js?v=21" defer></script>
   </head>
   <body class="product-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -144,9 +144,13 @@
                 data-produto="brownie-cobertura"
                 aria-label="Adicionar brownie com cobertura ao pedido"
               >
-                <div class="field">
+                <div
+                  class="field flavor-field"
+                  data-sabor-titulo="Cobertura do brownie"
+                  data-sabor-subtitulo="Escolha a cobertura do seu brownie."
+                  data-sabor-rotulo="Cobertura"
+                >
                   <span class="field-label">Cobertura <em class="req">obrigatório</em></span>
-                  <small class="field-hint" data-sabor-dica>Escolha uma opção.</small>
                   <div class="choice-grid">
                     <label><input type="radio" name="sabor" value="Chocolate 50% cacau"><span>Chocolate<small>50% cacau</small></span>
                     </label>
@@ -263,9 +267,13 @@
                 data-produto="marmitinha"
                 aria-label="Adicionar marmitinha ao pedido"
               >
-                <div class="field">
+                <div
+                  class="field flavor-field"
+                  data-sabor-titulo="Recheio da marmitinha"
+                  data-sabor-subtitulo="Escolha o recheio da sua marmitinha."
+                  data-sabor-rotulo="Recheio"
+                >
                   <span class="field-label">Recheio <em class="req">obrigatório</em></span>
-                  <small class="field-hint" data-sabor-dica>Escolha uma opção.</small>
                   <div class="choice-grid">
                     <label><input type="radio" name="sabor" value="Chocolate 50% cacau"><span>Chocolate<small>50% cacau</small></span>
                     </label>
@@ -347,7 +355,7 @@
             </details>
             <details>
               <summary>Pagamento</summary>
-              <p>O valor dos adicionais de decoração já está somado ao preço final da sua torta.</p>
+              <p>Os adicionais pagos de decoração já estão incluídos no preço final da sua torta.</p>
               <p>Você pode pagar por Pix ou cartão de crédito ou débito. Para pagamentos com cartão, enviamos um link de pagamento.</p>
             </details>
             <details>

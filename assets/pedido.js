@@ -84,6 +84,14 @@
       var p = JSON.parse(localStorage.getItem(STORAGE) || '[]');
       if (!Array.isArray(p)) return [];
       p.forEach(function (item) {
+        // Acetato gratuito desde 08/10/2026, inclusive em pedidos locais anteriores.
+        if (item && item.tipo === 'torta' && Array.isArray(item.extras)) {
+          item.extras.forEach(function (extra) {
+            if (extra.nome !== 'Acetato com laço') return;
+            if (typeof item.preco === 'number') item.preco -= extra.preco || 0;
+            extra.preco = 0;
+          });
+        }
         if (!item || ['brownie-cobertura', 'marmitinha', 'donuts'].indexOf(item.tipo) === -1 || !Array.isArray(item.detalhes)) return;
         item.detalhes = item.detalhes.map(function (detalhe) {
           return typeof detalhe === 'string'
@@ -307,7 +315,7 @@
       if (lista.length) {
         el.innerHTML = '<strong>' + lista.length +
           (lista.length === 1 ? ' escolhido' : ' escolhidos') +
-          ' · + ' + moeda(somaExtras(lista)).replace(' ', '\u00a0') + '</strong><small>' +
+          (somaExtras(lista) === 0 ? ' · Grátis' : ' · + ' + moeda(somaExtras(lista)).replace(' ', '\u00a0')) + '</strong><small>' +
           escapar(lista.map(function (a) {
             return a.nome;
           }).join(', ')) + '</small>';
@@ -517,11 +525,12 @@
     function abrir(form, botao, focarSub) {
       formAtivo = form;
       origem = botao;
+      var campo = form.querySelector('.flavor-field');
       var nome = form.dataset.linha ? 'Sabores ' + form.dataset.linha : 'Sabores do Bentô Cake';
-      titulo.textContent = nome;
-      sub.textContent = form.dataset.produto === 'bento'
+      titulo.textContent = campo.dataset.saborTitulo || nome;
+      sub.textContent = campo.dataset.saborSubtitulo || (form.dataset.produto === 'bento'
         ? 'Escolha o sabor do seu Bentô Cake.'
-        : 'Escolha o sabor da sua torta.';
+        : 'Escolha o sabor da sua torta.');
       montarLista(form);
       atualizarOk();
       picker.hidden = false;
@@ -591,7 +600,7 @@
       detalhe.textContent = partes.desc;
       detalhe.hidden = !partes.desc;
       botao.classList.toggle('has-desc', !detalhe.hidden);
-      botao.setAttribute('aria-label', 'Sabor: ' + nome + '. Ver os ' + total + ' sabores');
+      botao.setAttribute('aria-label', (campo.dataset.saborRotulo || 'Sabor') + ': ' + nome + '. Ver os ' + total + ' sabores');
     };
     form._resumoSabor();
     botao.addEventListener('click', function () { abrirSabores(form, botao); });
@@ -868,7 +877,7 @@
   }
   function textoAdicionais(lista) {
     if (!lista || !lista.length) return '';
-    return ' · ' + lista.length + (lista.length === 1 ? ' adicional' : ' adicionais') + ' (+ ' + moeda(somaExtras(lista)) + ')';
+    return ' · ' + lista.length + (lista.length === 1 ? ' adicional' : ' adicionais') + (somaExtras(lista) === 0 ? ' (grátis)' : ' (+ ' + moeda(somaExtras(lista)) + ')');
   }
   function ligarEscolhaObrigatoria(form, nome, mensagem) {
     var radios = form.querySelectorAll('[name=' + nome + ']');
@@ -938,8 +947,8 @@
       };
       form._atualizarPrevia();
     }
+    ligarSabor(form);
     if (tipo === 'torta' || tipo === 'bento') {
-      ligarSabor(form);
       ligarCobertura(form);
     }
     ligarValidacaoSabor(form);
@@ -1019,35 +1028,57 @@
   }
 
   /* ---------- checkout ---------- */
-  function linhaItem(i) {
-    var s = i.qtd + '× ' + i.nome;
-    if (i.detalhes.length) s += ' — ' + i.detalhes.join(' — ');
-    s += ' — ' + (i.preco == null ? 'valor a combinar' : moeda(i.preco * i.qtd));
-    return s;
-  }
   function textoMensagem(itens, dados) {
     var linhas = [
       'Olá! Montei meu pedido no site da Cakes JL e gostaria de confirmar os detalhes.',
+      '',
       'Nome: ' + dados.nome,
       '',
       'Pedido:'
     ];
     var total = 0, aCombinar = false;
     itens.forEach(function (i, k) {
-      linhas.push((k + 1) + ') ' + linhaItem(i));
-      if (i.extras.length) linhas.push('   Adicionais: ' + i.extras.map(function (e) {
-        return e.nome + ' (' + moeda(e.preco) + ')';
-      }).join('; '));
-      if (i.obs) linhas.push('   ' + i.obs);
-      if (i.preco == null) aCombinar = true; else total += i.preco * i.qtd;
+      linhas.push('');
+      // WhatsApp usa um asterisco de cada lado para o negrito.
+      linhas.push((k + 1) + ') *' + i.qtd + '× ' + i.nome + '*');
+      i.detalhes.forEach(function (detalhe, indice) {
+        if (i.tipo === 'torta' && indice === 0 && detalhe.indexOf('Outro sabor:') !== 0) {
+          linhas.push('Sabor: ' + detalhe);
+        } else if (i.tipo === 'bento' && indice === 0) {
+          linhas.push('Modelo: ' + detalhe);
+        } else {
+          linhas.push(detalhe);
+        }
+      });
+      if (i.extras.length) {
+        linhas.push('Adicionais por torta' + (i.preco == null ? ':' : ' (já incluídos no valor):'));
+        i.extras.forEach(function (extra) {
+          linhas.push('- ' + extra.nome + ' (' + (extra.preco === 0 ? 'Grátis' : moeda(extra.preco)) + ')');
+        });
+      }
+      if (i.obs) linhas.push(i.obs);
+      if (i.preco == null) {
+        linhas.push('Subtotal: a combinar');
+        aCombinar = true;
+      } else {
+        linhas.push(i.qtd > 1
+          ? 'Subtotal: ' + i.qtd + ' × ' + moeda(i.preco) + ' = ' + moeda(i.preco * i.qtd)
+          : 'Valor: ' + moeda(i.preco));
+        total += i.preco * i.qtd;
+      }
     });
     linhas.push('');
-    linhas.push('Total dos itens: ' + moeda(total) + (aCombinar ? ' (itens a combinar fora do total)' : ''));
+    linhas.push('*Total dos itens: ' + moeda(total) + '*');
+    if (aCombinar) linhas.push('Itens com valor a combinar não estão incluídos no total.');
     linhas.push('Sinal de 50%: ' + moeda(total / 2) + (aCombinar ? ' (sobre os itens com valor fechado)' : ''));
     linhas.push('');
     linhas.push('Retirada desejada: ' + dados.data + (dados.hora ? ', ' + dados.hora : '') + ' (a confirmar)');
-    linhas.push('Pagamento: ' + dados.pagamento + (dados.pagamento === 'Pix' ? ' (chave: ' + PIX.chave + ')' : ''));
-    if (dados.obs) linhas.push('Observações: ' + dados.obs);
+    linhas.push('Pagamento: ' + dados.pagamento);
+    if (dados.pagamento === 'Pix') linhas.push('Chave Pix: ' + PIX.chave);
+    if (dados.obs) {
+      linhas.push('');
+      linhas.push('Observações: ' + dados.obs);
+    }
     return linhas.join('\n');
   }
   function formatarData(iso) {
@@ -1067,9 +1098,18 @@
     var dataEl = form.querySelector('[name=data]');
     var nomeEl = form.querySelector('[name=nome]');
     var horaEl = form.querySelector('[name=hora]');
-    var hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    dataEl.min = hoje.toISOString().slice(0, 10);
+    // A retirada usa o horário de Gravatal, mesmo em aparelhos de outro fuso.
+    var formatoRetirada = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    });
+    function limiteRetirada(horas) {
+      // O campo aceita minutos: arredondar para cima preserva as horas completas.
+      var minima = new Date(Math.ceil((Date.now() + horas * 3600000) / 60000) * 60000);
+      var partes = {};
+      formatoRetirada.formatToParts(minima).forEach(function (parte) { partes[parte.type] = parte.value; });
+      return { data: partes.year + '-' + partes.month + '-' + partes.day, hora: partes.hour + ':' + partes.minute };
+    }
 
     function mostrarErro(campo, msg) {
       var el = form.querySelector('[data-erro="' + campo + '"]');
@@ -1105,7 +1145,7 @@
           '<div class="cart-item-main"><strong>' + escapar(i.nome) + '</strong>' +
           (i.detalhes.length ? '<span>' + escapar(i.detalhes.join(' · ')) + '</span>' : '') +
           (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) {
-            return e.nome + ' (' + moeda(e.preco) + ')';
+            return e.nome + ' (' + (e.preco === 0 ? 'Grátis' : moeda(e.preco)) + ')';
           }).join(', ')) + '</span>' : '') +
           (i.obs ? '<span>' + escapar(i.obs) + '</span>' : '') + '</div>' +
           '<div class="cart-item-side"><div class="qty"><button type="button" data-menos aria-label="Diminuir quantidade">−</button><input type="number" name="qtd" min="1" max="99" inputmode="numeric" value="' + i.qtd + '" aria-label="Quantidade"><button type="button" data-mais aria-label="Aumentar quantidade">+</button></div>' +
@@ -1142,14 +1182,40 @@
       atualizarContadores(itens);
     }
     function conferirData() {
-      var itens = lerPedido();
-      if (!dataEl.value) { avisoData.hidden = true; return; }
-      var escolhida = new Date(dataEl.value + 'T' + (horaEl.value || '23:59'));
-      var minima = new Date(Date.now() + prazoHoras(itens) * 3600000);
-      avisoData.hidden = escolhida >= minima;
+      var horas = prazoHoras(lerPedido());
+      var limite = limiteRetirada(horas);
+      dataEl.min = limite.data;
+      horaEl.min = dataEl.value === limite.data ? limite.hora : '';
+      var diaAntes = !!dataEl.value && dataEl.value < limite.data;
+      var horaAntes = dataEl.value === limite.data && !!horaEl.value && horaEl.value < limite.hora;
+      var invalida = diaAntes || horaAntes;
+      avisoData.hidden = !invalida;
+      if (invalida) {
+        avisoData.querySelector('[data-aviso-titulo]').textContent = 'Antecedência mínima de ' + horas + ' horas';
+        avisoData.querySelector('[data-aviso-texto]').textContent =
+          'Não é possível continuar com essa retirada. Escolha uma data e um horário a partir de ' +
+          formatarData(limite.data) + ' às ' + limite.hora + ' (horário de Gravatal).';
+      }
+      if (dataEl.value) dataEl.setAttribute('aria-invalid', diaAntes ? 'true' : 'false');
+      if (horaEl.value) horaEl.setAttribute('aria-invalid', horaAntes ? 'true' : 'false');
+      return !invalida;
     }
-    dataEl.addEventListener('change', conferirData);
-    horaEl.addEventListener('change', conferirData);
+    [dataEl, horaEl].forEach(function (campo) {
+      campo.addEventListener('input', function () {
+        if (campo.value) mostrarErro(campo.name, '');
+        conferirData();
+      });
+      campo.addEventListener('change', conferirData);
+      campo.addEventListener('focus', conferirData);
+      campo.addEventListener(window.PointerEvent ? 'pointerup' : 'click', function (ev) {
+        conferirData();
+        if (typeof campo.showPicker !== 'function') return;
+        try {
+          campo.showPicker();
+          ev.preventDefault();
+        } catch (_) { /* Mantém o controle nativo e a digitação quando indisponível. */ }
+      }, true); // Captura também o clique nos segmentos internos de data/hora.
+    });
     // Pix (04/10/2026): ao marcar Pix aparece o quadro com a chave e o botão Copiar; com cartão, só a nota do link
     var pixCheckout = form.querySelector('[data-pix]');
     var cartaoNota = form.querySelector('[data-cartao-nota]');
@@ -1165,8 +1231,6 @@
     });
     atualizarPagamento();
     nomeEl.addEventListener('input', function () { if (nomeEl.value.trim().length >= 2) mostrarErro('nome', ''); });
-    dataEl.addEventListener('input', function () { if (dataEl.value) mostrarErro('data', ''); });
-    horaEl.addEventListener('input', function () { if (horaEl.value) mostrarErro('hora', ''); });
 
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -1184,6 +1248,9 @@
       exigir('hora', horaEl, !!horaEl.value, 'Informe o horário em que gostaria de retirar.');
       var pag = form.querySelector('[name=pagamento]:checked');
       exigir('pagamento', form.querySelector('[name=pagamento]'), !!pag, 'Escolha a forma de pagamento para continuar.');
+      if (!conferirData() && !primeiroErro) {
+        primeiroErro = dataEl.getAttribute('aria-invalid') === 'true' ? dataEl : horaEl;
+      }
       if (primeiroErro) {
         primeiroErro.focus();
         return;
@@ -1211,11 +1278,19 @@
         var pixObrigado = obrigado.querySelector('[data-pix]');
         if (pixObrigado) pixObrigado.hidden = dados.pagamento !== 'Pix';
         var nomeSpan = obrigado.querySelector('[data-obrigado-nome]');
-        if (nomeSpan) nomeSpan.textContent = nome;
+        if (nomeSpan) nomeSpan.textContent = nome.split(/\s+/)[0];
         obrigado.scrollIntoView({ behavior: 'smooth', block: 'start' });
         var foco = obrigado.querySelector('h2');
         if (foco) foco.focus();
       }
+    });
+    // Reabrir a mensagem também exige prazo válido se o cliente ficou na tela final.
+    if (reenviar) reenviar.addEventListener('click', function (ev) {
+      if (conferirData()) return;
+      ev.preventDefault();
+      if (obrigado) obrigado.hidden = true;
+      render();
+      (dataEl.getAttribute('aria-invalid') === 'true' ? dataEl : horaEl).focus();
     });
     if (obrigado) {
       var editar = obrigado.querySelector('[data-editar]');
@@ -1225,6 +1300,7 @@
         resumo.hidden = false;
         form.hidden = false;
         if (caixa) caixa.hidden = false;
+        conferirData();
         lista.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
       var novo = obrigado.querySelector('[data-novo]');
