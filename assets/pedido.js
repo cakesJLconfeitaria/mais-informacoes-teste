@@ -84,6 +84,10 @@
       var p = JSON.parse(localStorage.getItem(STORAGE) || '[]');
       if (!Array.isArray(p)) return [];
       p.forEach(function (item) {
+        // O peso informado para as duas opções do Bentô foi corrigido em 09/10/2026.
+        if (item && item.tipo === 'bento' && item.nome === 'Bentô Cake (aprox. 300 g)') {
+          item.nome = 'Bentô Cake (aprox. 700 g)';
+        }
         // Acetato gratuito desde 08/10/2026, inclusive em pedidos locais anteriores.
         if (item && item.tipo === 'torta' && Array.isArray(item.extras)) {
           item.extras.forEach(function (extra) {
@@ -98,6 +102,10 @@
             ? detalhe.replace('Casadinho (chocolate + Ninho)', 'Dois amores (chocolate + ninho)')
             : detalhe;
         });
+        // Antes da escolha de 09/10/2026, toda marmitinha levava morango.
+        if (item.tipo === 'marmitinha' && !item.detalhes.some(function (detalhe) {
+          return detalhe === 'Com morango' || detalhe === 'Sem morango';
+        })) item.detalhes.push('Com morango');
       });
       return p;
     } catch (_) {
@@ -137,6 +145,31 @@
     return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
 
+  function iniciarTortaBuilder() {
+    var builder = document.querySelector('[data-torta-builder]');
+    if (!builder) return;
+    var botoes = Array.prototype.slice.call(builder.querySelectorAll('[data-torta-target]'));
+    var cards = Array.prototype.slice.call(builder.querySelectorAll('.flavor-card'));
+    var hint = builder.querySelector('[data-torta-hint]');
+    if (botoes.length !== cards.length || botoes.some(function (botao) {
+      return !cards.some(function (card) { return card.id === botao.dataset.tortaTarget; });
+    })) return;
+    builder.classList.add('enhanced');
+    botoes.forEach(function (botao) {
+      botao.addEventListener('click', function () {
+        var alvo = botao.dataset.tortaTarget;
+        botoes.forEach(function (opcao) {
+          opcao.setAttribute('aria-pressed', String(opcao === botao));
+        });
+        cards.forEach(function (card) {
+          if (card.id === alvo) card.dataset.active = 'true';
+          else delete card.dataset.active;
+        });
+        if (hint) hint.textContent = 'Você escolheu ' + botao.querySelector('strong').textContent + '. Monte sua torta abaixo.';
+      });
+    });
+  }
+
   /* ---------- contador fixo e botão "Meu pedido" do canto ---------- */
   function atualizarContadores(itens) {
     var n = totalQtd(itens || lerPedido());
@@ -161,6 +194,28 @@
     a.hidden = true;
     a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 5h2l2 11h11l2-8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>Ver pedido <span class="cart-fab-n" data-pedido-contador>0</span>';
     document.body.appendChild(a);
+  }
+  function acompanharFabNoRodape() {
+    var fab = document.querySelector('.cart-fab');
+    var linkRodape = document.querySelector('.product-page:not(.pedido-page) .footer-actions .cart-link');
+    if (!fab || !linkRodape) return;
+    function alternar(proximoDoRodape) {
+      fab.classList.toggle('near-footer', proximoDoRodape);
+    }
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entradas) {
+        alternar(entradas[0].isIntersecting);
+      }, { rootMargin: '0px 0px 64px 0px' });
+      observer.observe(linkRodape);
+    } else {
+      function verificar() {
+        var area = linkRodape.getBoundingClientRect();
+        alternar(area.top <= window.innerHeight + 64 && area.bottom >= 0);
+      }
+      window.addEventListener('scroll', verificar, { passive: true });
+      window.addEventListener('resize', verificar);
+      verificar();
+    }
   }
   var toastTimer = 0;
   function toast(msg) {
@@ -217,11 +272,15 @@
       // sabor escolhido por botões (radio); Dois amores = chocolate + ninho, mesmo preço
       var saborEscolhido = form.querySelector('[name=sabor]:checked');
       item.detalhes.push(base.opcao + ': ' + (saborEscolhido ? saborEscolhido.value : ''));
+      if (tipo === 'marmitinha') {
+        var morango = form.querySelector('[name=morango]:checked');
+        item.detalhes.push(morango.value === 'com' ? 'Com morango' : 'Sem morango');
+      }
     } else if (tipo === 'bento') {
       var op = form.querySelector('[name=opcao]:checked').value;
       var saborB = form.querySelector('[name=sabor]:checked');
       var sabor = saborB ? saborB.value : '';
-      item.nome = 'Bentô Cake (aprox. 300 g)';
+      item.nome = 'Bentô Cake (aprox. 700 g)';
       item.preco = BENTO[op].preco + (sabor === 'Ninho com geleia de morango' ? BENTO.geleia : 0);
       item.detalhes.push(BENTO[op].nome);
       item.detalhes.push('Sabor: ' + sabor +
@@ -883,7 +942,7 @@
     var radios = form.querySelectorAll('[name=' + nome + ']');
     if (!radios.length) return null;
     var campo = radios[0].closest('.field');
-    var grade = campo.querySelector('.size-grid, .bento-options');
+    var grade = campo.querySelector('.size-grid, .bento-options, .choice-grid');
     var erro = document.createElement('small');
     erro.className = 'field-error js-only';
     erro.id = 'erro-' + nome + '-' + Array.prototype.indexOf.call(document.querySelectorAll('form[data-produto]'), form);
@@ -891,7 +950,7 @@
     erro.hidden = true;
     campo.appendChild(erro);
     grade.setAttribute('role', 'radiogroup');
-    grade.setAttribute('aria-label', nome === 'tamanho' ? 'Tamanho' : 'Opção do Bentô Cake');
+    grade.setAttribute('aria-label', nome === 'tamanho' ? 'Tamanho' : nome === 'morango' ? 'Morango' : 'Opção do Bentô Cake');
     grade.setAttribute('aria-required', 'true');
     radios.forEach(function (r) {
       r.setAttribute('aria-describedby', erro.id);
@@ -914,6 +973,9 @@
     var tipo = form.dataset.produto;
     var tamanhoOk = ligarEscolhaObrigatoria(form, 'tamanho', 'Escolha o tamanho antes de adicionar ao pedido.');
     var opcaoOk = ligarEscolhaObrigatoria(form, 'opcao', 'Escolha uma opção de Bentô Cake antes de adicionar ao pedido.');
+    var morangoOk = tipo === 'marmitinha'
+      ? ligarEscolhaObrigatoria(form, 'morango', 'Escolha com ou sem morango antes de adicionar ao pedido.')
+      : null;
     var aoMudarQtd = function () {
       if (form._atualizarPrevia) form._atualizarPrevia();
     };
@@ -934,9 +996,12 @@
     if (tipo === 'brownie-cobertura' || tipo === 'marmitinha' || tipo === 'donuts') {
       form._atualizarPrevia = function () {
         var s = form.querySelector('[name=sabor]:checked');
-        mostrarPrevia(form, CATALOGO[tipo].preco, s ? CATALOGO[tipo].opcao + ': ' + s.value : '');
+        var morango = tipo === 'marmitinha' && form.querySelector('[name=morango]:checked');
+        var detalhe = s ? CATALOGO[tipo].opcao + ': ' + s.value : '';
+        if (morango) detalhe += (detalhe ? ' · ' : '') + (morango.value === 'com' ? 'Com morango' : 'Sem morango');
+        mostrarPrevia(form, CATALOGO[tipo].preco, detalhe);
       };
-      form.querySelectorAll('[name=sabor]').forEach(function (r) {
+      form.querySelectorAll('[name=sabor],[name=morango]').forEach(function (r) {
         r.addEventListener('change', form._atualizarPrevia);
       });
       form._atualizarPrevia();
@@ -1000,6 +1065,7 @@
       ev.preventDefault();
       if (opcaoOk && !opcaoOk()) return;
       if (form._saborOk && !form._saborOk()) return;
+      if (morangoOk && !morangoOk()) return;
       if (tamanhoOk && !tamanhoOk()) return;
       if (form._coberturaOk && !form._coberturaOk()) return; // cobertura obrigatória nas tortas e no Bentô (06/10/2026)
       var item = montarItem(form);
@@ -1175,9 +1241,7 @@
       });
       resumo.querySelector('[data-combinar]').hidden = !aCombinar;
       var h = prazoHoras(itens);
-      prazoEl.textContent = h === PRAZO_TORTAS_H
-        ? 'Seu pedido inclui torta, Matilda ou Bentô Cake. Pedimos pelo menos 48 horas de antecedência.'
-        : 'Para brownies e donuts, pedimos pelo menos 24 horas de antecedência.';
+      prazoEl.textContent = 'Para este pedido, pedimos pelo menos ' + h + ' horas de antecedência.';
       conferirData();
       atualizarContadores(itens);
     }
@@ -1367,7 +1431,9 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     montarFab();
+    acompanharFabNoRodape();
     ligarCopiar();
+    iniciarTortaBuilder();
     iniciarAdicionais();
     iniciarSabores();
     iniciarCoberturas();

@@ -29,9 +29,9 @@
     <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=25">
-  <script src="../assets/pedido.js?v=21" defer></script>
+    <script src="../assets/site.js?v=7"></script>
+    <link rel="stylesheet" href="../assets/site.css?v=31">
+  <script src="../assets/pedido.js?v=25" defer></script>
   </head>
   <body class="product-page pedido-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -165,7 +165,19 @@
             </div>
             <ul class="cart-list" data-lista aria-label="Itens do pedido">
             </ul>
-            <p class="order-guidance">Depois de escolher, preencha seus dados e continue no WhatsApp. A confirmação e o pagamento acontecem na conversa.</p>
+            <div class="summary" data-resumo hidden>
+              <p class="order-deadline" data-prazo aria-live="polite"></p>
+              <div>
+                <span>Total dos itens</span>
+                <strong data-total>R$ 0,00</strong>
+              </div>
+              <div>
+                <span>Sinal de 50% para confirmar</span>
+                <strong data-sinal>R$ 0,00</strong>
+              </div>
+              <p class="hint" data-combinar hidden>Itens com valor a combinar não estão incluídos neste total. Confirmamos o valor deles com você pelo WhatsApp. O sinal de 50% é calculado sobre os itens com valor definido.</p>
+              <button type="button" class="limpar" data-limpar>Esvaziar pedido</button>
+            </div>
           </div>
           <section class="thanks" data-obrigado hidden aria-live="polite">
             <h2 tabindex="-1">Seu pedido está pronto, <span data-obrigado-nome></span>!</h2>
@@ -222,20 +234,6 @@
             </div>
           </section>
         </section>
-        <div class="summary" data-resumo hidden>
-          <div>
-            <span>Total dos itens</span>
-            <strong data-total>R$ 0,00</strong>
-          </div>
-          <div>
-            <span>Sinal de 50% para confirmar</span>
-            <strong data-sinal>R$ 0,00</strong>
-          </div>
-          <p class="hint" data-combinar hidden>Itens com valor a combinar não estão incluídos neste total. Confirmamos o valor deles com você pelo WhatsApp. O sinal de 50% é calculado sobre os itens com valor definido.</p>
-          <p class="hint" data-prazo>
-          </p>
-          <button type="button" class="limpar" data-limpar>Esvaziar pedido</button>
-        </div>
         <form class="checkout" data-checkout hidden novalidate>
           <label class="field"><span>Seu nome <em class="req">obrigatório</em></span><input
               type="text"

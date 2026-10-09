@@ -48,7 +48,8 @@
     popup.setAttribute('role', 'dialog');
     popup.setAttribute('aria-modal', 'true');
     popup.innerHTML =
-      '<div class="lightbox-stage" data-stage><img alt="" draggable="false"></div>' +
+      '<div class="lightbox-stage" data-stage><div class="lightbox-photo-frame" data-photo-frame>' +
+      '<img alt="" aria-hidden="true" draggable="false"><img alt="" aria-hidden="true" draggable="false"></div></div>' +
       '<button type="button" class="lightbox-close" data-close aria-label="Fechar foto">' + ICONE_X + '</button>' +
       '<div class="lightbox-bar"><div class="lightbox-info">' +
       '<span class="lightbox-kicker" data-kicker hidden></span><strong class="lightbox-title" data-title></strong>' +
@@ -61,7 +62,8 @@
     document.body.appendChild(popup);
 
     var palco = popup.querySelector('[data-stage]');
-    var imagem = palco.querySelector('img');
+    var moldura = palco.querySelector('[data-photo-frame]');
+    var imagens = moldura.querySelectorAll('img');
     var fechar = popup.querySelector('[data-close]');
     var anterior = popup.querySelector('[data-previous]');
     var proxima = popup.querySelector('[data-next]');
@@ -72,7 +74,8 @@
     var descricao = popup.querySelector('[data-desc]');
     var leitor = popup.querySelector('[data-live]');
     var painel = document.querySelector('.panel');
-    var grupo = null, atual = 0, origem = null;
+    var grupo = null, atual = 0, exibido = 0, origem = null;
+    var camadaAtiva = 0, trocaPendente = 0;
 
     function dadosDaFoto(g, link) {
       // título: o da foto (adicionais) ou o do grupo (produto); valor: o da foto (Bentô) ou o do grupo; data-hide-desc deixa só nome e valor, mantendo o alt da imagem
@@ -94,12 +97,9 @@
       el.hidden = !valor;
     }
 
-    function mostrar(indice) {
-      atual = Math.max(0, Math.min(grupo.links.length - 1, indice));
-      var foto = dadosDaFoto(grupo, grupo.links[atual]);
+    function atualizarFoto(foto) {
+      exibido = atual;
       var posicao = (atual + 1) + ' de ' + grupo.links.length;
-      imagem.src = foto.src;
-      imagem.alt = foto.alt;
       texto(chapeu, foto.chapeu);
       texto(titulo, foto.titulo);
       texto(preco, foto.preco);
@@ -116,23 +116,72 @@
       var ativo = document.activeElement; // se a seta usada ficou desabilitada, o foco não pode se perder
       if (!ativo || ativo === document.body || ativo.disabled || !popup.contains(ativo)) fechar.focus();
     }
+    function mostrar(indice, imediato) {
+      var destino = Math.max(0, Math.min(grupo.links.length - 1, indice));
+      if (!imediato && destino === atual) return;
+      atual = destino;
+      var foto = dadosDaFoto(grupo, grupo.links[atual]);
+      var troca = ++trocaPendente;
+      if (imediato) {
+        imagens[camadaAtiva].src = foto.src;
+        imagens[camadaAtiva].alt = foto.alt;
+        imagens[camadaAtiva].removeAttribute('aria-hidden');
+        imagens[camadaAtiva].classList.add('is-visible');
+        atualizarFoto(foto);
+        return;
+      }
+      // A foto atual permanece visível até a próxima estar pronta para a dissolução.
+      var carregando = new Image();
+      function trocar() {
+        if (troca !== trocaPendente || popup.hidden || !grupo) return;
+        var anterior = imagens[camadaAtiva];
+        var proxima = imagens[1 - camadaAtiva];
+        proxima.classList.remove('is-visible');
+        proxima.src = foto.src;
+        proxima.alt = foto.alt;
+        void proxima.offsetWidth;
+        requestAnimationFrame(function () {
+          if (troca !== trocaPendente || popup.hidden || !grupo) return;
+          proxima.classList.add('is-visible');
+          anterior.classList.remove('is-visible');
+          proxima.removeAttribute('aria-hidden');
+          anterior.setAttribute('aria-hidden', 'true');
+          camadaAtiva = 1 - camadaAtiva;
+          atualizarFoto(foto);
+        });
+      }
+      carregando.src = foto.src;
+      if (carregando.decode) carregando.decode().then(trocar, trocar);
+      else if (carregando.complete) trocar();
+      else {
+        carregando.onload = trocar;
+        carregando.onerror = trocar;
+      }
+    }
     function abrir(g, indice, link) {
       grupo = g; origem = link;
       popup.classList.toggle('single', g.links.length < 2);
       popup.hidden = false;
       document.body.classList.add('lightbox-open');
       if (painel && 'inert' in painel) painel.inert = true;
-      mostrar(indice);
+      camadaAtiva = 0;
+      imagens.forEach(function (img) { img.classList.remove('is-visible'); });
+      mostrar(indice, true);
       fechar.focus();
     }
     function encerrar() {
       if (popup.hidden) return;
+      ++trocaPendente;
       popup.hidden = true;
       document.body.classList.remove('lightbox-open');
       if (painel && 'inert' in painel) painel.inert = false;
-      imagem.removeAttribute('src');
+      imagens.forEach(function (img) {
+        img.classList.remove('is-visible');
+        img.setAttribute('aria-hidden', 'true');
+        img.removeAttribute('src');
+      });
       // no carrossel, volta para a foto que estava aberta no popup (06/10/2026)
-      var vista = grupo && grupo.links[atual];
+      var vista = grupo && grupo.links[exibido];
       if (vista && vista.classList.contains('slide') && vista !== origem) {
         var trilho = vista.parentNode;
         trilho.style.scrollBehavior = 'auto'; // pula direto, sem animar por trás do popup
@@ -158,7 +207,7 @@
     anterior.addEventListener('click', function () { mostrar(atual - 1); });
     proxima.addEventListener('click', function () { mostrar(atual + 1); });
     popup.addEventListener('click', function (event) {
-      if (event.target === popup || event.target === palco) encerrar();
+      if (event.target === popup || event.target === palco || event.target === moldura) encerrar();
     });
     document.addEventListener('keydown', function (event) {
       if (popup.hidden) return;

@@ -567,6 +567,92 @@ button:disabled {
   box-shadow: var(--card-shadow)
 }
 
+.torta-builder-start {
+  display: none
+}
+
+.torta-builder.enhanced {
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--card-shadow)
+}
+
+.torta-builder.enhanced .torta-builder-start {
+  display: grid
+}
+
+.torta-builder-start h2 {
+  font-size: 18px
+}
+
+.torta-builder-start>p {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 4px
+}
+
+.torta-line-options {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 8px;
+  margin-top: 15px
+}
+
+.torta-line-option {
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  min-height: 66px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  line-height: 1.3;
+  transition: background .15s,border-color .15s,transform .12s
+}
+
+.torta-line-option strong {
+  font-size: 12px
+}
+
+.torta-line-option small {
+  font-size: 10px;
+  color: var(--muted)
+}
+
+.torta-line-option:hover,
+.torta-line-option[aria-pressed=true] {
+  border-color: var(--accent);
+  background: var(--soft)
+}
+
+.torta-line-option:active {
+  transform: scale(.98)
+}
+
+.torta-builder.enhanced .flavor-card:not([data-active=true]) {
+  display: none
+}
+
+.torta-builder.enhanced .flavor-card[data-active=true] {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 17px 0 0;
+  box-shadow: none;
+  margin-top: 16px
+}
+
+@media(min-width:700px) {
+  .torta-line-options {
+    grid-template-columns: repeat(4,minmax(0,1fr))
+  }
+}
+
 .flavor-top {
   margin-bottom: 14px
 }
@@ -1043,12 +1129,13 @@ html:not(.js) .js-only {
 .cart-fab {
   position: fixed;
   right: 16px;
-  bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 30;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 16px;
+  min-height: 44px;
+  padding: 12px 16px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -1056,7 +1143,15 @@ html:not(.js) .js-only {
   font-size: 12px;
   font-weight: 600;
   box-shadow: 0 10px 30px #7b405440;
-  transition: transform .2s
+  touch-action: manipulation;
+  transition: opacity .2s ease,visibility .2s ease,transform .2s ease
+}
+
+.cart-fab.near-footer {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px)
 }
 
 .cart-fab svg {
@@ -1526,16 +1621,36 @@ html:not(.js) .js-only {
   touch-action: pan-y
 }
 
-.lightbox-stage img {
+.lightbox-photo-frame {
+  position: relative;
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0
+}
+
+.lightbox-photo-frame img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
   max-width: 100%;
   max-height: 100%;
   width: auto;
   height: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease-in-out;
   border-radius: 12px;
   background: #24191e;
   box-shadow: 0 20px 60px #0006;
   user-select: none;
   -webkit-user-drag: none
+}
+
+.lightbox-photo-frame img.is-visible {
+  opacity: 1;
+  pointer-events: auto
 }
 
 .lightbox-close {
@@ -2553,6 +2668,31 @@ html:not(.js) .bento-pick input,html:not(.js) .pick-dot {
   box-shadow: 0 2px 8px #0003
 }
 
+.pedido-page .empty-state .catalog-row {
+  background: color-mix(in srgb, var(--panel) 58%, transparent);
+  border-color: color-mix(in srgb, var(--line-strong) 48%, transparent);
+  box-shadow: 0 1px 3px #9a526808
+}
+
+.pedido-page .empty-state .catalog-row svg {
+  color: var(--muted)
+}
+
+.pedido-page .empty-state .catalog-row:hover,
+.pedido-page .empty-state .catalog-row:focus-visible {
+  background: var(--panel);
+  border-color: var(--accent)
+}
+
+.pedido-page .empty-state .catalog-row:hover svg,
+.pedido-page .empty-state .catalog-row:focus-visible svg {
+  color: var(--accent)
+}
+
+[data-theme=dark] .pedido-page .empty-state .catalog-row {
+  box-shadow: 0 1px 3px #0001
+}
+
 
 /* P24 (04/10/2026): quadro do Pix com a chave, botão Copiar, titular e sinal (checkout, ao marcar Pix; tela final) */
 .pix-box {
@@ -2872,6 +3012,16 @@ html.js .nojs-only {
   justify-self: center
 }
 
+.pedido-page .cart-item-side .qty button {
+  width: 34px;
+  height: 36px
+}
+
+.pedido-page .cart-item-side .qty input {
+  width: 42px;
+  height: 36px
+}
+
 .cart-item-side .cart-remove {
   grid-column: 1;
   grid-row: 2;
@@ -3183,14 +3333,19 @@ html.js .nojs-only {
   gap: 6px
 }
 
-.order-guidance {
+.order-card .summary {
   margin-top: 16px;
-  padding-top: 12px;
+  padding: 14px 0 0;
   border-top: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent
+}
+
+.order-card .order-deadline {
+  margin: 0 0 4px;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--muted);
-  text-align: center
 }
 
 .order-card .thanks {
@@ -3244,6 +3399,11 @@ html.js .nojs-only {
 
 /* P56 (08/10/2026): grupo centralizado somente nas três páginas de produtos. */
 .product-page:not(.pedido-page) .footer-actions {
+  justify-content: center
+}
+
+/* Em Meu pedido há apenas redes sociais nesta linha do rodapé. */
+.pedido-page .footer-actions {
   justify-content: center
 }
 

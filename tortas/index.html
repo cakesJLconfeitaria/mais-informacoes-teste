@@ -28,9 +28,9 @@
     <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="../assets/site.js?v=6"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=23">
-  <script src="../assets/pedido.js?v=21" defer></script>
+    <script src="../assets/site.js?v=7"></script>
+    <link rel="stylesheet" href="../assets/site.css?v=32">
+  <script src="../assets/pedido.js?v=25" defer></script>
   </head>
   <body class="product-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -104,8 +104,20 @@
         <h1 class="sr-only">Tortas e bolos</h1>
         <section class="section" id="tortas">
           <h2 class="sr-only">Tortas</h2>
-          <div class="flavor-grid">
-            <article class="flavor-card" aria-labelledby="linha-tc">
+          <div class="torta-builder" data-torta-builder>
+            <div class="torta-builder-start js-only">
+              <h2>Monte sua torta</h2>
+              <p>Escolha o tipo de torta para ver sabores, tamanhos e preços.</p>
+              <div class="torta-line-options" role="group" aria-label="Tipo de torta">
+                <button type="button" class="torta-line-option" data-torta-target="torta-classicos" aria-controls="torta-classicos" aria-pressed="false"><strong>Clássicos</strong><small>A partir de R$ 159,00</small></button>
+                <button type="button" class="torta-line-option" data-torta-target="torta-especiais" aria-controls="torta-especiais" aria-pressed="false"><strong>Especiais</strong><small>A partir de R$ 170,00</small></button>
+                <button type="button" class="torta-line-option" data-torta-target="torta-premium" aria-controls="torta-premium" aria-pressed="false"><strong>Premium</strong><small>A partir de R$ 200,00</small></button>
+                <button type="button" class="torta-line-option" data-torta-target="torta-outro" aria-controls="torta-outro" aria-pressed="false"><strong>Outro sabor</strong><small>Valor a combinar</small></button>
+              </div>
+              <p class="torta-builder-hint" data-torta-hint aria-live="polite">Escolha uma opção para começar.</p>
+            </div>
+            <div class="flavor-grid">
+            <article class="flavor-card" id="torta-classicos" aria-labelledby="linha-tc">
               <header class="flavor-top">
                 <h3 id="linha-tc">Clássicos</h3>
               </header>
@@ -263,7 +275,7 @@
                 <p class="nojs-note">Seu navegador está sem JavaScript. Para encomendar, fale com a gente pelo WhatsApp.</p>
               </noscript>
             </article>
-            <article class="flavor-card" aria-labelledby="linha-te">
+            <article class="flavor-card" id="torta-especiais" aria-labelledby="linha-te">
               <header class="flavor-top">
                 <h3 id="linha-te">Especiais</h3>
               </header>
@@ -428,7 +440,7 @@
                 <p class="nojs-note">Seu navegador está sem JavaScript. Para encomendar, fale com a gente pelo WhatsApp.</p>
               </noscript>
             </article>
-            <article class="flavor-card" aria-labelledby="linha-tp">
+            <article class="flavor-card" id="torta-premium" aria-labelledby="linha-tp">
               <header class="flavor-top">
                 <h3 id="linha-tp">Premium</h3>
               </header>
@@ -587,7 +599,7 @@
                 <p class="nojs-note">Seu navegador está sem JavaScript. Para encomendar, fale com a gente pelo WhatsApp.</p>
               </noscript>
             </article>
-            <article class="flavor-card flavor-card-other" aria-labelledby="linha-outro">
+            <article class="flavor-card flavor-card-other" id="torta-outro" aria-labelledby="linha-outro">
               <header class="flavor-top">
                 <h3 id="linha-outro">Outro sabor ou combinação</h3>
                 <p>Não encontrou o sabor que procura? Conte a combinação que você imagina ou <a
@@ -724,6 +736,7 @@
                 <p class="nojs-note">Seu navegador está sem JavaScript. Para encomendar, fale com a gente pelo WhatsApp.</p>
               </noscript>
             </article>
+            </div>
           </div>
         </section>
         <section class="section" id="especiais">
@@ -824,7 +837,7 @@
             </article>
             <article class="special-card" data-photos="Bentô Cake" aria-labelledby="bento-titulo">
               <h3 id="bento-titulo">Bentô Cake</h3>
-              <p>Aproximadamente 300 g · serve até 2 pessoas.</p>
+              <p>Aproximadamente 700 g · rende até 4 pessoas.</p>
               <form
                 class="order-form"
                 data-produto="bento"
