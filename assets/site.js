@@ -7,7 +7,7 @@
   function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = theme === 'dark' ? '#24161c' : '#fcecf1';
+    if (meta) meta.content = theme === 'dark' ? '#241f1e' : '#f2ece5';
     var toggle = document.querySelector('[data-theme-toggle]');
     if (toggle) {
       toggle.setAttribute('aria-label', theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro');

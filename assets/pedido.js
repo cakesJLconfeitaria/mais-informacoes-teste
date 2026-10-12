@@ -1,44 +1,8 @@
-/* Pedido pelo site — carrinho local e checkout único pelo WhatsApp.
-   Sem backend: o pedido fica no navegador do cliente (localStorage) e vira
-   uma mensagem de WhatsApp. Preços aqui devem bater com os das páginas e
-   com Precificacao-produtos.xlsx. Criado em 03/10/2026; em 03/10/2026 o sabor
-   dos produtos novos passou a ser escolhido por botões (chocolate 50% cacau,
-   Ninho ou a mistura de chocolate e ninho), sem acréscimo. Em 04/10/2026 o
-   horário de retirada passou a ser obrigatório no checkout e o link "Meu
-   pedido" saiu do menu de categorias para o canto superior direito de todas
-   as páginas (.cart-link).
-   Ainda em 04/10/2026 a página de tortas passou a ter um formulário por linha
-   (data-linha="Clássicos" | "Especiais" | "Premium"; vazio = outro sabor, a
-   combinar), tamanho e sabor por botões, e os adicionais escolhidos num popup
-   compartilhado ([data-addons-picker]); o Bentô escolhe opção e sabor por
-   botões. A mensagem do WhatsApp não mudou de formato. Em 04/10/2026 (P19,
-   revisão de linguagem) mudaram só os textos gerados aqui: aviso ao adicionar,
-   resumo dos adicionais ("Nenhum adicional escolhido" / "Ver opções"), avisos
-   de antecedência, mensagens de preenchimento, a primeira linha da mensagem
-   do WhatsApp e os prefixos "Observações da torta:" e "Frase ou desenho:".
-   Ainda em 04/10/2026 (P20 a P24): os adicionais passaram a ter preço fechado
-   (entram no preço do item, no total, no sinal e na mensagem; só "Outro sabor"
-   continua a combinar); cada card ganhou a faixa "Preço final" (valor ×
-   quantidade, com o detalhe embaixo); a página do pedido ganhou o cartão rosa
-   da lista ([data-carrinho]) e o quadro do Pix com botão Copiar ([data-pix]),
-   mostrado ao marcar Pix e na tela final; a mensagem leva a chave Pix. O
-   formato dos itens guardados mudou (extras com preco), por isso STORAGE
-   passou de v1 para v2. Em 06/10/2026 o sabor das tortas e do Bentô passou a
-   ser escolhido num popup ([data-flavor-picker], criado aqui): o card mostra o
-   sabor escolhido e o botão que abre a lista; os botões de sabor continuam no
-   HTML (sem JavaScript aparecem no card) e são eles que guardam a escolha.
-   Ainda em 06/10/2026: cada sabor ganhou a descrição da Larissa (<small> no
-   botão); as escolhas que dependem do sabor ficam em campos [data-campo]
-   com data-para (o sabor) e data-formato (Morangos com {v}; Dois amores,
-   massa {v}); e tortas e Bentô ganharam o campo obrigatório "Cobertura"
-   ([data-cobertura-campo]): Chantilly e, quando o sabor tem, o recheio mais
-   barato dele (data-cobertura no botão do sabor ou do creme: "Chocolate 50%
-   cacau", "Ninho" ou os dois separados por |; vazio = só chantilly).
-   Vai na mensagem como "Cobertura: ...". Em 06/10/2026, a cobertura
-   também passou a exigir escolha explícita, mesmo quando só há chantilly,
-   e a abrir um popup no mesmo estilo do seletor de sabor. Ainda em 06/10/2026,
-   o sabor antes chamado casadinho passou a se chamar Dois amores nos brownies
-   e donuts; pedidos antigos com esse nome são lidos com o nome atual. */
+/* Carrinho local e checkout pelo WhatsApp, sem backend.
+   Preços e produtos acompanham as decisões de Jonas, o HTML e, para os
+   produtos novos, a planilha de precificação. O pedido fica no localStorage.
+   As adaptações em lerPedido preservam pedidos salvos com dados anteriores.
+   Histórico das decisões e manutenção: PENDENCIAS.md e README.md. */
 (function () {
   'use strict';
 
@@ -468,7 +432,7 @@
       resumo(form);
     });
   }
-  /* ---------- popup de sabores (tortas e Bentô, 06/10/2026) ----------
+  /* ---------- popup de sabores e recheios ----------
      Os botões de sabor (radio name=sabor, e name=morangos nos Especiais)
      continuam no formulário e guardam a escolha; com JavaScript eles ficam
      escondidos e o card mostra o sabor escolhido num botão que abre este popup
@@ -477,7 +441,7 @@
   var abrirSabores = null;
   var ICONE_SETA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
   function partesDoSabor(input) {
-    // nome = texto do <span> sem o <small>; descrição = o <small> (detalhe, preço extra ou, no futuro, o que leva o sabor)
+    // Nome vem do <span>; descrição, ingredientes ou preço extra vêm do <small>.
     var span = input.parentNode.querySelector('span');
     var nome = '', desc = '';
     if (span) {

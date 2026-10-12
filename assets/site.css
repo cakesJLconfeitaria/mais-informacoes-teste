@@ -2257,7 +2257,7 @@ html:not(.js) .bento-pick input,html:not(.js) .pick-dot {
 }
 
 
-/* Cardápio da home dentro de um cartão rosa claro (decisão de Jonas, 04/10/2026); .note-box é a mesma ideia para notas e avisos */
+/* Base do bloco Cardápio e das notas; a identidade visual vigente fica na seção final. */
 .catalog-box {
   background: var(--soft);
   border-radius: 16px;
@@ -2399,33 +2399,6 @@ html:not(.js) .bento-pick input,html:not(.js) .pick-dot {
 
 .category-nav {
   view-transition-name: catnav
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(8px)
-  }
-  to {
-    opacity: 1;
-    transform: none
-  }
-}
-
-.catalog-row,.product-entry,.flavor-card,.special-card,.page-title {
-  animation: rise .4s cubic-bezier(.2,.7,.2,1) both
-}
-
-.catalog-row:nth-child(2),.product-entry:nth-child(2),.flavor-card:nth-child(2),.special-card:nth-child(2) {
-  animation-delay: .06s
-}
-
-.catalog-row:nth-child(3),.product-entry:nth-child(3),.flavor-card:nth-child(3),.special-card:nth-child(3) {
-  animation-delay: .12s
-}
-
-.flavor-card:nth-child(n+4) {
-  animation-delay: .18s
 }
 
 .button,.catalog-row,.category-nav a,.choice-grid label,.cart-link,.social-links a,.qty button,.thumb {
@@ -2640,7 +2613,7 @@ html:not(.js) .bento-pick input,html:not(.js) .pick-dot {
 }
 
 
-/* P23 (04/10/2026): área dos itens em cartão rosa claro — vazia (ícone, frase e as três linhas do cardápio) ou com itens em cartões brancos */
+/* Carrinho: estado vazio, cartões de itens e resumo; cores do layout vigente na seção final. */
 .cart-box {
   background: var(--soft);
   border-radius: 16px;
@@ -3073,7 +3046,7 @@ html.js .nojs-only {
 }
 
 
-/* 06/10/2026 (decisões de Jonas): título das páginas internas em cartão rosa claro com o ícone da categoria */
+/* Estilos compartilhados de títulos e ícones; Meu pedido integra o título ao cartão de itens. */
 .title-card {
   background: var(--soft);
   border-radius: 16px;
@@ -3117,7 +3090,7 @@ html.js .nojs-only {
 }
 
 
-/* "Como encomendar" igual nas três páginas: acordeão dentro do cartão rosa claro; títulos das seções e bloco final centralizados */
+/* Política de encomendas comum às quatro páginas internas, com títulos e ajuda centralizados. */
 .section-heading {
   text-align: center
 }
@@ -3159,7 +3132,7 @@ html.js .nojs-only {
 }
 
 
-/* Sabores das tortas e do Bentô em popup (06/10/2026): no card fica o sabor escolhido (com a descrição, quando houver) e o botão abre a lista; sem JavaScript, os botões de sabor continuam no card */
+/* Sabores e recheios de tortas, Bentô, brownies e donuts: resumo no card e lista em popup; sem JavaScript, as opções ficam visíveis. */
 .flavor-field.enhanced .choice-grid,.flavor-field.enhanced~[data-campo] {
   display: none!important
 }
@@ -3464,5 +3437,264 @@ html.js .nojs-only {
   }
   .footer-actions .social-links a {
     width: 32px
+  }
+}
+
+/* Layout Confeitaria clássica — aprovado por Jonas em 12/10/2026. */
+.panel,.catalog-row,.product-entry,.flavor-card,.special-card,.cart-item,.page-title {
+  box-shadow: none;
+}
+
+.catalog-row,.product-entry,.flavor-card,.special-card,.page-title {
+  animation: none;
+}
+
+.product-entry,.special-card,.flavor-card {
+  border-width: 1px;
+}
+
+.catalog-box,.how-card,.order-card,.price-panel,.optional-group,.pix-box {
+  box-shadow: none;
+}
+
+.flavor-trigger,.addons-trigger {
+  border-width: 1px;
+}
+
+.size-card,.order-form .size-card {
+  border-width: 1px;
+}
+
+.carousel {
+  background: var(--photo);
+}
+
+.cart-link,.theme-toggle,.social-links a {
+  box-shadow: none;
+}
+
+.button,.cart-fab,.pix-copy {
+  box-shadow: none;
+}
+
+@media(max-width:600px) {
+  .panel {
+    margin: 12px auto;
+  }
+}
+
+:root {
+  --bg: #f2ece5;
+  --panel: #fffdf9;
+  --surface: #fffdf9;
+  --ink: #352c2b;
+  --muted: #756762;
+  --accent: #91445a;
+  --accent-hover: #743348;
+  --line: #e5dbd3;
+  --line-strong: #d7c4ba;
+  --soft: #f5eee8;
+  --photo: #f3eeea;
+}
+
+body {
+  background: #f2ece5;
+}
+
+.panel {
+  border: 1px solid #e5dbd3;
+  border-radius: 12px;
+}
+
+h1,h2,h3,.torta-builder-start h2,.addons-head h2 {
+  font-family: Georgia,'Times New Roman',serif;
+  font-weight: 500;
+  letter-spacing: -.025em;
+}
+
+.product-body h2,.special-card h3 {
+  font-size: 23px;
+}
+
+.torta-builder-start h2 {
+  font-size: 22px;
+}
+
+.catalog-box {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.catalog-heading {
+  color: var(--ink);
+  letter-spacing: .16em;
+}
+
+.catalog-row {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 15px 16px;
+}
+
+.catalog-row strong {
+  font-family: Georgia,'Times New Roman',serif;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.catalog-row small {
+  font-size: 11px;
+}
+
+.catalog-box .catalog-row {
+  background: var(--panel);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.category-nav {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.category-nav a {
+  border-radius: 5px;
+}
+
+.category-nav a[aria-current=page] {
+  box-shadow: none;
+}
+
+.product-entry,.special-card,.torta-builder.enhanced {
+  border-radius: 8px;
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.torta-line-option {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.torta-line-option strong {
+  font-family: Georgia,'Times New Roman',serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.section-divider h2 {
+  font-family: Georgia,'Times New Roman',serif;
+  font-size: 19px;
+}
+
+.size-card,.order-form .size-card {
+  background: var(--soft);
+  border-radius: 5px;
+}
+
+.size-card:has(input:checked) {
+  border-color: var(--accent);
+  background: #f0dedb;
+}
+
+.flavor-trigger,.addons-trigger,.choice-grid label {
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.flavor-summary strong {
+  color: var(--ink);
+}
+
+.price-panel {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.price-panel .final-price-value {
+  font-family: Georgia,'Times New Roman',serif;
+  font-weight: 500;
+  font-size: 25px;
+}
+
+.button,.pix-copy,.cart-fab {
+  border-radius: 6px;
+}
+
+.optional-group,.how-card,.order-card,.pix-box {
+  background: var(--soft);
+  border-radius: 8px;
+}
+
+.order-card {
+  border: 1px solid var(--line);
+}
+
+.cart-box .cart-item {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.checkout {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.checkout input,.checkout textarea,.order-form textarea,.order-form input[type=text] {
+  border-radius: 5px;
+  background: var(--panel);
+}
+
+.flavor-pick {
+  border-radius: 5px;
+}
+
+.title-icon {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.order-heading h1 {
+  font-size: 25px;
+}
+
+[data-theme=dark] {
+  --bg: #241f1e;
+  --panel: #302927;
+  --surface: #302927;
+  --ink: #f4eee7;
+  --muted: #bbaaa0;
+  --accent: #e6a4b7;
+  --accent-hover: #f2c1ce;
+  --line: #4a3d37;
+  --line-strong: #665047;
+  --soft: #3a302c;
+  --photo: #362d29;
+}
+
+[data-theme=dark] body {
+  background: var(--bg);
+}
+
+[data-theme=dark] .panel {
+  border-color: var(--line);
+}
+
+[data-theme=dark] .size-card:has(input:checked) {
+  background: #55403f;
+}
+
+/* Mantém preços com até 99 unidades dentro da coluna em celulares estreitos. */
+@media(max-width:380px) {
+  .price-panel .final-price-value {
+    font-size: 17px;
   }
 }
