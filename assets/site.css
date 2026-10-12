@@ -453,6 +453,10 @@ button:disabled {
   gap: 9px
 }
 
+.matilda-size-grid {
+  grid-template-columns: repeat(2,minmax(0,1fr))
+}
+
 .size-card,.order-form .size-card {
   position: relative;
   display: grid;
@@ -1233,6 +1237,40 @@ html:not(.js) .js-only {
 
 .cart-link.has-items .cart-link-n {
   display: inline-grid
+}
+
+/* Controles do topo acompanham a marca menor das quatro páginas internas. */
+.product-panel > .theme-toggle {
+  top: 18px;
+  right: 18px;
+  width: 30px;
+  height: 30px
+}
+
+.product-panel > .theme-toggle svg {
+  width: 14px;
+  height: 14px
+}
+
+.product-panel > .cart-link {
+  top: 18px;
+  right: 56px;
+  height: 30px;
+  gap: 5px;
+  padding: 0 9px;
+  font-size: 10px
+}
+
+.product-panel > .cart-link svg {
+  width: 14px;
+  height: 14px
+}
+
+.product-panel > .cart-link .cart-link-n {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 9px
 }
 
 [data-theme=dark] .cart-link-n {

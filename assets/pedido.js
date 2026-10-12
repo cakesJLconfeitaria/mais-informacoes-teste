@@ -52,17 +52,21 @@
     'brownie-cobertura': { nome: 'Brownie com cobertura', preco: 14, grupo: 'novos', opcao: 'Cobertura' },
     'marmitinha': { nome: 'Marmitinha brownie recheada', preco: 24.9, grupo: 'novos', opcao: 'Recheio' },
     'donuts': { nome: 'Donuts no copinho (6 unidades)', preco: 23, grupo: 'novos', opcao: 'Recheio da tampa' },
-    'matilda': { nome: 'Bolo Matilda (M, aro 20, aprox. 3 kg)', preco: 170, grupo: 'tortas' },
+    'matilda': { nome: 'Bolo Matilda', grupo: 'tortas' },
     'bento': { nome: 'Bentô Cake', grupo: 'tortas' },
     'torta': { nome: 'Torta', grupo: 'tortas' }
   };
   var TORTA = {
-    tamanhos: { P: 'P (aro 15, 12 fatias)', M: 'M (aro 20, 24 fatias)', G: 'G (aro 25, 40 fatias)' },
+    tamanhos: { P: 'P (aro 15, 15 fatias)', M: 'M (aro 20, 24 fatias)', G: 'G (aro 25, 40 fatias)' },
     linhas: {
       'Clássicos': { P: 159, M: 230, G: 320 },
       'Especiais': { P: 170, M: 270, G: 360 },
       'Premium': { P: 200, M: 300, G: 420 }
     }
+  };
+  var MATILDA = {
+    P: { nome: 'Bolo Matilda (P, aro 15, aprox. 2 kg)', preco: 90, detalhe: 'Tamanho P · aro 15' },
+    M: { nome: 'Bolo Matilda (M, aro 20, aprox. 3 kg)', preco: 170, detalhe: 'Tamanho M · aro 20' }
   };
   var BENTO = {
     flork: { nome: 'Flork com escrita, somente escrita ou pequenos desenhos em preto', preco: 70 },
@@ -87,6 +91,10 @@
         // O peso informado para as duas opções do Bentô foi corrigido em 09/10/2026.
         if (item && item.tipo === 'bento' && item.nome === 'Bentô Cake (aprox. 300 g)') {
           item.nome = 'Bentô Cake (aprox. 700 g)';
+        }
+        // Rendimento do tamanho P corrigido em 12/10/2026, inclusive em pedidos locais anteriores.
+        if (item && item.tipo === 'torta' && item.nome === 'Torta P (aro 15, 12 fatias)') {
+          item.nome = 'Torta ' + TORTA.tamanhos.P;
         }
         // Acetato gratuito desde 08/10/2026, inclusive em pedidos locais anteriores.
         if (item && item.tipo === 'torta' && Array.isArray(item.extras)) {
@@ -187,6 +195,7 @@
     });
   }
   function montarFab() {
+    if (document.body.classList.contains('home')) return;
     if (document.querySelector('.cart-fab')) return;
     var a = document.createElement('a');
     a.className = 'cart-fab';
@@ -276,6 +285,10 @@
         var morango = form.querySelector('[name=morango]:checked');
         item.detalhes.push(morango.value === 'com' ? 'Com morango' : 'Sem morango');
       }
+    } else if (tipo === 'matilda') {
+      var tamanhoMatilda = form.querySelector('[name=tamanho]:checked').value;
+      item.nome = MATILDA[tamanhoMatilda].nome;
+      item.preco = MATILDA[tamanhoMatilda].preco;
     } else if (tipo === 'bento') {
       var op = form.querySelector('[name=opcao]:checked').value;
       var saborB = form.querySelector('[name=sabor]:checked');
@@ -1008,8 +1021,13 @@
     }
     if (tipo === 'matilda') {
       form._atualizarPrevia = function () {
-        mostrarPrevia(form, CATALOGO.matilda.preco, 'Tamanho M · aro 20');
+        var tamanho = form.querySelector('[name=tamanho]:checked');
+        if (!tamanho) mostrarPrevia(form, null, 'Escolha o tamanho', 'Selecione o tamanho');
+        else mostrarPrevia(form, MATILDA[tamanho.value].preco, MATILDA[tamanho.value].detalhe);
       };
+      form.querySelectorAll('[name=tamanho]').forEach(function (r) {
+        r.addEventListener('change', form._atualizarPrevia);
+      });
       form._atualizarPrevia();
     }
     ligarSabor(form);
