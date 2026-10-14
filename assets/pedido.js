@@ -14,7 +14,7 @@
 
   var CATALOGO = {
     'brownie-cobertura': { nome: 'Brownie com cobertura', preco: 14, grupo: 'novos', opcao: 'Cobertura' },
-    'marmitinha': { nome: 'Marmitinha brownie recheada', preco: 24.9, grupo: 'novos', opcao: 'Recheio' },
+    'marmitinha': { nome: 'Marmitinha brownie recheada', precos: { com: 24.9, sem: 21.9 }, grupo: 'novos', opcao: 'Recheio' },
     'donuts': { nome: 'Donuts no copinho (6 unidades)', preco: 23, grupo: 'novos', opcao: 'Recheio da tampa' },
     'matilda': { nome: 'Bolo Matilda', grupo: 'tortas' },
     'bento': { nome: 'Bentô Cake', grupo: 'tortas' },
@@ -52,9 +52,10 @@
       var p = JSON.parse(localStorage.getItem(STORAGE) || '[]');
       if (!Array.isArray(p)) return [];
       p.forEach(function (item) {
-        // O peso informado para as duas opções do Bentô foi corrigido em 09/10/2026.
-        if (item && item.tipo === 'bento' && item.nome === 'Bentô Cake (aprox. 300 g)') {
-          item.nome = 'Bentô Cake (aprox. 700 g)';
+        // Peso corrigido em 13/10/2026, inclusive em pedidos locais anteriores.
+        if (item && item.tipo === 'bento' &&
+          (item.nome === 'Bentô Cake (aprox. 300 g)' || item.nome === 'Bentô Cake (aprox. 700 g)')) {
+          item.nome = 'Bentô Cake (aprox. 500 g)';
         }
         // Rendimento do tamanho P corrigido em 12/10/2026, inclusive em pedidos locais anteriores.
         if (item && item.tipo === 'torta' && item.nome === 'Torta P (aro 15, 12 fatias)') {
@@ -78,6 +79,10 @@
         if (item.tipo === 'marmitinha' && !item.detalhes.some(function (detalhe) {
           return detalhe === 'Com morango' || detalhe === 'Sem morango';
         })) item.detalhes.push('Com morango');
+        // Preços por versão, inclusive ao reabrir pedidos locais anteriores.
+        if (item.tipo === 'marmitinha') {
+          item.preco = CATALOGO.marmitinha.precos[item.detalhes.indexOf('Sem morango') !== -1 ? 'sem' : 'com'];
+        }
       });
       return p;
     } catch (_) {
@@ -248,6 +253,7 @@
       if (tipo === 'marmitinha') {
         var morango = form.querySelector('[name=morango]:checked');
         item.detalhes.push(morango.value === 'com' ? 'Com morango' : 'Sem morango');
+        item.preco = CATALOGO.marmitinha.precos[morango.value];
       }
     } else if (tipo === 'matilda') {
       var tamanhoMatilda = form.querySelector('[name=tamanho]:checked').value;
@@ -257,7 +263,7 @@
       var op = form.querySelector('[name=opcao]:checked').value;
       var saborB = form.querySelector('[name=sabor]:checked');
       var sabor = saborB ? saborB.value : '';
-      item.nome = 'Bentô Cake (aprox. 700 g)';
+      item.nome = 'Bentô Cake (aprox. 500 g)';
       item.preco = BENTO[op].preco + (sabor === 'Ninho com geleia de morango' ? BENTO.geleia : 0);
       item.detalhes.push(BENTO[op].nome);
       item.detalhes.push('Sabor: ' + sabor +
@@ -974,9 +980,17 @@
       form._atualizarPrevia = function () {
         var s = form.querySelector('[name=sabor]:checked');
         var morango = tipo === 'marmitinha' && form.querySelector('[name=morango]:checked');
+        var preco = CATALOGO[tipo].preco;
+        if (tipo === 'marmitinha') {
+          if (!morango) {
+            mostrarPrevia(form, null, 'Escolha com ou sem morango', 'Selecione uma opção');
+            return;
+          }
+          preco = CATALOGO.marmitinha.precos[morango.value];
+        }
         var detalhe = s ? CATALOGO[tipo].opcao + ': ' + s.value : '';
         if (morango) detalhe += (detalhe ? ' · ' : '') + (morango.value === 'com' ? 'Com morango' : 'Sem morango');
-        mostrarPrevia(form, CATALOGO[tipo].preco, detalhe);
+        mostrarPrevia(form, preco, detalhe);
       };
       form.querySelectorAll('[name=sabor],[name=morango]').forEach(function (r) {
         r.addEventListener('change', form._atualizarPrevia);
@@ -1076,6 +1090,23 @@
   }
 
   /* ---------- checkout ---------- */
+  function resumoPedido(itens) {
+    var resumo = { definidos: [], combinar: [], total: 0 };
+    itens.forEach(function (item) {
+      if (item.preco == null) resumo.combinar.push(item);
+      else {
+        resumo.definidos.push(item);
+        resumo.total += item.preco * item.qtd;
+      }
+    });
+    return resumo;
+  }
+  function gruposPedido(resumo) {
+    return resumo.combinar.length ? [
+      { titulo: 'Produtos com preço definido', itens: resumo.definidos },
+      { titulo: 'Produtos com valor a combinar', itens: resumo.combinar }
+    ] : [{ titulo: '', itens: resumo.definidos }];
+  }
   function textoMensagem(itens, dados) {
     var linhas = [
       'Olá! Montei meu pedido no site da Cakes JL e gostaria de confirmar os detalhes.',
@@ -1084,45 +1115,64 @@
       '',
       'Pedido:'
     ];
-    var total = 0, aCombinar = false;
-    itens.forEach(function (i, k) {
-      linhas.push('');
-      // WhatsApp usa um asterisco de cada lado para o negrito.
-      linhas.push((k + 1) + ') *' + i.qtd + '× ' + i.nome + '*');
-      i.detalhes.forEach(function (detalhe, indice) {
-        if (i.tipo === 'torta' && indice === 0 && detalhe.indexOf('Outro sabor:') !== 0) {
-          linhas.push('Sabor: ' + detalhe);
-        } else if (i.tipo === 'bento' && indice === 0) {
-          linhas.push('Modelo: ' + detalhe);
+    var resumo = resumoPedido(itens);
+    var aCombinar = resumo.combinar.length > 0;
+    var entrega = dados.recebimento === 'entrega';
+    var pendente = aCombinar || entrega;
+    var numero = 0;
+    gruposPedido(resumo).forEach(function (grupo) {
+      if (!grupo.itens.length) return;
+      if (grupo.titulo) linhas.push('', '*' + grupo.titulo + '*');
+      grupo.itens.forEach(function (i) {
+        linhas.push('');
+        // WhatsApp usa um asterisco de cada lado para o negrito.
+        linhas.push((++numero) + ') *' + i.qtd + '× ' + i.nome + '*');
+        i.detalhes.forEach(function (detalhe, indice) {
+          if (i.tipo === 'torta' && indice === 0 && detalhe.indexOf('Outro sabor:') !== 0) {
+            linhas.push('Sabor: ' + detalhe);
+          } else if (i.tipo === 'bento' && indice === 0) {
+            linhas.push('Modelo: ' + detalhe);
+          } else {
+            linhas.push(detalhe);
+          }
+        });
+        if (i.extras.length) {
+          linhas.push('Adicionais por torta' + (i.preco == null ? ':' : ' (já incluídos no valor):'));
+          i.extras.forEach(function (extra) {
+            linhas.push('- ' + extra.nome + ' (' + (extra.preco === 0 ? 'Grátis' : moeda(extra.preco)) + ')');
+          });
+        }
+        if (i.obs) linhas.push(i.obs);
+        if (i.preco == null) {
+          linhas.push('Subtotal: a combinar');
         } else {
-          linhas.push(detalhe);
+          linhas.push(i.qtd > 1
+            ? 'Subtotal: ' + i.qtd + ' × ' + moeda(i.preco) + ' = ' + moeda(i.preco * i.qtd)
+            : 'Valor: ' + moeda(i.preco));
         }
       });
-      if (i.extras.length) {
-        linhas.push('Adicionais por torta' + (i.preco == null ? ':' : ' (já incluídos no valor):'));
-        i.extras.forEach(function (extra) {
-          linhas.push('- ' + extra.nome + ' (' + (extra.preco === 0 ? 'Grátis' : moeda(extra.preco)) + ')');
-        });
-      }
-      if (i.obs) linhas.push(i.obs);
-      if (i.preco == null) {
-        linhas.push('Subtotal: a combinar');
-        aCombinar = true;
-      } else {
-        linhas.push(i.qtd > 1
-          ? 'Subtotal: ' + i.qtd + ' × ' + moeda(i.preco) + ' = ' + moeda(i.preco * i.qtd)
-          : 'Valor: ' + moeda(i.preco));
-        total += i.preco * i.qtd;
-      }
     });
     linhas.push('');
-    linhas.push('*Total dos itens: ' + moeda(total) + '*');
-    if (aCombinar) linhas.push('Itens com valor a combinar não estão incluídos no total.');
-    linhas.push('Sinal de 50%: ' + moeda(total / 2) + (aCombinar ? ' (sobre os itens com valor fechado)' : ''));
+    if (resumo.definidos.length) linhas.push('*' +
+      (aCombinar ? 'Subtotal dos produtos com preço definido: ' : 'Total dos produtos: ') + moeda(resumo.total) + '*');
+    if (aCombinar) linhas.push('Os produtos com valor a combinar serão acertados e finalizados pelo WhatsApp.');
+    if (entrega) {
+      linhas.push('Taxa de entrega: valor a combinar');
+    }
+    if (pendente) {
+      linhas.push('*' + (entrega ? 'Total com entrega' : 'Total do pedido') + ': a confirmar pelo WhatsApp*');
+      linhas.push('Sinal de 50%: a calcular sobre o valor final do pedido' +
+        (entrega ? ', incluindo a taxa de entrega' : ''));
+    } else {
+      linhas.push('Sinal de 50%: ' + moeda(resumo.total / 2));
+    }
+    linhas.push('Restante: pago na ' + (entrega ? 'entrega' : 'retirada'));
     linhas.push('');
-    linhas.push('Retirada desejada: ' + dados.data + (dados.hora ? ', ' + dados.hora : '') + ' (a confirmar)');
-    linhas.push('Pagamento: ' + dados.pagamento);
-    if (dados.pagamento === 'Pix') linhas.push('Chave Pix: ' + PIX.chave);
+    linhas.push('Recebimento: ' + (dados.recebimento === 'entrega' ? 'Entrega' : 'Retirada'));
+    linhas.push((dados.recebimento === 'entrega' ? 'Entrega desejada: ' : 'Retirada desejada: ') +
+      dados.data + (dados.hora ? ', ' + dados.hora : '') + ' (a confirmar)');
+    linhas.push('Pagamento do sinal: ' + dados.pagamento);
+    if (dados.pagamento === 'Pix' && !pendente) linhas.push('Chave Pix: ' + PIX.chave);
     if (dados.obs) {
       linhas.push('');
       linhas.push('Observações: ' + dados.obs);
@@ -1146,7 +1196,7 @@
     var dataEl = form.querySelector('[name=data]');
     var nomeEl = form.querySelector('[name=nome]');
     var horaEl = form.querySelector('[name=hora]');
-    // A retirada usa o horário de Gravatal, mesmo em aparelhos de outro fuso.
+    // Retirada e entrega usam o horário de Gravatal, mesmo em aparelhos de outro fuso.
     var formatoRetirada = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
@@ -1169,6 +1219,52 @@
         input.setAttribute('aria-invalid', msg ? 'true' : 'false');
       });
     }
+    function recebimentoEscolhido() {
+      var escolhido = form.querySelector('[name=recebimento]:checked');
+      return escolhido ? escolhido.value : '';
+    }
+    function atualizarValores() {
+      var valores = resumoPedido(lerPedido());
+      var aCombinar = valores.combinar.length > 0;
+      var recebimento = recebimentoEscolhido();
+      var entrega = recebimento === 'entrega';
+      var pendente = aCombinar || entrega;
+      resumo.querySelector('[data-subtotal-produtos]').hidden = !valores.definidos.length;
+      resumo.querySelector('[data-total-produtos-rotulo]').textContent = aCombinar ? 'Produtos com preço definido' : 'Total dos produtos';
+      resumo.querySelector('[data-total]').textContent = moeda(valores.total);
+      resumo.querySelector('[data-resumo-combinar]').hidden = !aCombinar;
+      var qtdCombinar = totalQtd(valores.combinar);
+      resumo.querySelector('[data-quantidade-combinar]').textContent = qtdCombinar + (qtdCombinar === 1 ? ' unidade' : ' unidades');
+      resumo.querySelector('[data-sinal]').textContent = !recebimento ? 'A definir' : pendente ? 'A combinar' : moeda(valores.total / 2);
+      resumo.querySelector('[data-resumo-entrega]').hidden = !entrega;
+      resumo.querySelector('[data-total-final]').hidden = !pendente;
+      resumo.querySelector('[data-total-final-rotulo]').textContent = entrega ? 'Total com entrega' : 'Total do pedido';
+      resumo.querySelector('[data-combinar]').hidden = !aCombinar;
+      resumo.querySelector('[data-recebimento-aviso]').textContent = entrega
+        ? aCombinar ? 'A taxa de entrega também será combinada pelo WhatsApp.'
+          : 'Combinamos a taxa pelo WhatsApp e confirmamos o total e o sinal de 50%, incluindo a entrega.'
+        : recebimento ? 'O restante é pago na retirada.' : 'Escolha retirada ou entrega para ver como confirmar o pedido.';
+      document.querySelectorAll('[data-pix-sinal]').forEach(function (el) {
+        el.textContent = recebimento === 'retirada' && !pendente ? moeda(valores.total / 2) : 'A definir';
+      });
+      resumo.querySelector('[data-combinar]').textContent = 'Os produtos com valor a combinar serão acertados e finalizados pelo WhatsApp. O sinal de 50% será calculado sobre o valor final do pedido' +
+        (entrega ? ', incluindo a taxa de entrega.' : '.');
+      atualizarPagamento();
+    }
+    function atualizarRecebimento() {
+      var recebimento = recebimentoEscolhido();
+      var entrega = recebimento === 'entrega';
+      form.querySelector('[data-rotulo-data]').textContent = entrega ? 'Data de entrega' : recebimento ? 'Data de retirada' : 'Data desejada';
+      form.querySelector('[data-rotulo-hora]').textContent = entrega ? 'Horário de entrega' : recebimento ? 'Horário de retirada' : 'Horário desejado';
+      form.querySelector('[data-recebimento-dica]').textContent = entrega
+        ? 'Combinamos o endereço e a taxa pelo WhatsApp antes de confirmar o pedido.'
+        : recebimento ? 'Retirada no bairro Bela Vista 1, em Gravatal, em data e horário combinados.' : 'Escolha uma opção para continuar.';
+      if (recebimento) mostrarErro('recebimento', '');
+      atualizarValores();
+    }
+    form.querySelectorAll('[name=recebimento]').forEach(function (radio) {
+      radio.addEventListener('change', atualizarRecebimento);
+    });
     function render() {
       var itens = lerPedido();
       lista.innerHTML = '';
@@ -1182,46 +1278,50 @@
         atualizarContadores(itens);
         return;
       }
-      var total = 0, aCombinar = false;
-      itens.forEach(function (i) {
-        var li = document.createElement('li');
-        li.className = 'cart-item';
-        var sub = i.preco == null ? 'a combinar' : moeda(i.preco * i.qtd);
-        if (i.preco == null) aCombinar = true;
-        if (i.preco != null) total += i.preco * i.qtd;
-        li.innerHTML =
-          '<div class="cart-item-main"><strong>' + escapar(i.nome) + '</strong>' +
-          (i.detalhes.length ? '<span>' + escapar(i.detalhes.join(' · ')) + '</span>' : '') +
-          (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) {
-            return e.nome + ' (' + (e.preco === 0 ? 'Grátis' : moeda(e.preco)) + ')';
-          }).join(', ')) + '</span>' : '') +
-          (i.obs ? '<span>' + escapar(i.obs) + '</span>' : '') + '</div>' +
-          '<div class="cart-item-side"><div class="qty"><button type="button" data-menos aria-label="Diminuir quantidade">−</button><input type="number" name="qtd" min="1" max="99" inputmode="numeric" value="' + i.qtd + '" aria-label="Quantidade"><button type="button" data-mais aria-label="Aumentar quantidade">+</button></div>' +
-          '<strong class="cart-item-sub">' + sub + '</strong><button type="button" class="cart-remove" data-remover>Remover</button></div>';
-        var input = li.querySelector('[name=qtd]');
-        function setQtd(n) {
-          n = Math.max(1, Math.min(99, n || 1));
-          i.qtd = n;
-          gravarPedido(itens);
-          render();
+      gruposPedido(resumoPedido(itens)).forEach(function (grupo) {
+        if (!grupo.itens.length) return;
+        if (grupo.titulo) {
+          var cabecalho = document.createElement('li');
+          cabecalho.className = 'cart-group-heading';
+          cabecalho.setAttribute('role', 'presentation');
+          var titulo = document.createElement('h2');
+          titulo.textContent = grupo.titulo;
+          cabecalho.appendChild(titulo);
+          lista.appendChild(cabecalho);
         }
-        li.querySelector('[data-menos]').addEventListener('click', function () { setQtd(i.qtd - 1); });
-        li.querySelector('[data-mais]').addEventListener('click', function () { setQtd(i.qtd + 1); });
-        input.addEventListener('change', function () { setQtd(parseInt(input.value, 10)); });
-        li.querySelector('[data-remover]').addEventListener('click', function () {
-          var idx = itens.indexOf(i);
-          if (idx > -1) itens.splice(idx, 1);
-          gravarPedido(itens);
-          render();
+        grupo.itens.forEach(function (i) {
+          var li = document.createElement('li');
+          li.className = 'cart-item';
+          var sub = i.preco == null ? 'a combinar' : moeda(i.preco * i.qtd);
+          li.innerHTML =
+            '<div class="cart-item-main"><strong>' + escapar(i.nome) + '</strong>' +
+            (i.detalhes.length ? '<span>' + escapar(i.detalhes.join(' · ')) + '</span>' : '') +
+            (i.extras.length ? '<span>Adicionais: ' + escapar(i.extras.map(function (e) {
+              return e.nome + ' (' + (e.preco === 0 ? 'Grátis' : moeda(e.preco)) + ')';
+            }).join(', ')) + '</span>' : '') +
+            (i.obs ? '<span>' + escapar(i.obs) + '</span>' : '') + '</div>' +
+            '<div class="cart-item-side"><div class="qty"><button type="button" data-menos aria-label="Diminuir quantidade">−</button><input type="number" name="qtd" min="1" max="99" inputmode="numeric" value="' + i.qtd + '" aria-label="Quantidade"><button type="button" data-mais aria-label="Aumentar quantidade">+</button></div>' +
+            '<strong class="cart-item-sub">' + sub + '</strong><button type="button" class="cart-remove" data-remover>Remover</button></div>';
+          var input = li.querySelector('[name=qtd]');
+          function setQtd(n) {
+            n = Math.max(1, Math.min(99, n || 1));
+            i.qtd = n;
+            gravarPedido(itens);
+            render();
+          }
+          li.querySelector('[data-menos]').addEventListener('click', function () { setQtd(i.qtd - 1); });
+          li.querySelector('[data-mais]').addEventListener('click', function () { setQtd(i.qtd + 1); });
+          input.addEventListener('change', function () { setQtd(parseInt(input.value, 10)); });
+          li.querySelector('[data-remover]').addEventListener('click', function () {
+            var idx = itens.indexOf(i);
+            if (idx > -1) itens.splice(idx, 1);
+            gravarPedido(itens);
+            render();
+          });
+          lista.appendChild(li);
         });
-        lista.appendChild(li);
       });
-      resumo.querySelector('[data-total]').textContent = moeda(total);
-      resumo.querySelector('[data-sinal]').textContent = moeda(total / 2);
-      document.querySelectorAll('[data-pix-sinal]').forEach(function (el) {
-        el.textContent = moeda(total / 2);
-      });
-      resumo.querySelector('[data-combinar]').hidden = !aCombinar;
+      atualizarValores();
       var h = prazoHoras(itens);
       prazoEl.textContent = 'Para este pedido, pedimos pelo menos ' + h + ' horas de antecedência.';
       conferirData();
@@ -1239,7 +1339,7 @@
       if (invalida) {
         avisoData.querySelector('[data-aviso-titulo]').textContent = 'Antecedência mínima de ' + horas + ' horas';
         avisoData.querySelector('[data-aviso-texto]').textContent =
-          'Não é possível continuar com essa retirada. Escolha uma data e um horário a partir de ' +
+          'Para este pedido, escolha uma data e um horário a partir de ' +
           formatarData(limite.data) + ' às ' + limite.hora + ' (horário de Gravatal).';
       }
       if (dataEl.value) dataEl.setAttribute('aria-invalid', diaAntes ? 'true' : 'false');
@@ -1268,8 +1368,19 @@
     function atualizarPagamento() {
       var pag = form.querySelector('[name=pagamento]:checked');
       var ehPix = !!pag && pag.value === 'Pix';
-      if (pixCheckout) pixCheckout.hidden = !ehPix;
+      var entrega = recebimentoEscolhido() === 'entrega';
+      var aCombinar = resumoPedido(lerPedido()).combinar.length > 0;
+      var pendente = aCombinar || entrega;
+      if (pixCheckout) pixCheckout.hidden = !ehPix || recebimentoEscolhido() !== 'retirada' || pendente;
       if (cartaoNota) cartaoNota.hidden = !pag || ehPix;
+      if (cartaoNota) cartaoNota.textContent = pendente
+        ? 'Enviamos o link de pagamento pelo WhatsApp após confirmar o valor final e o sinal.'
+        : 'Enviamos o link de pagamento pelo WhatsApp.';
+      var aviso = form.querySelector('[data-pagamento-pendente]');
+      aviso.hidden = !pendente;
+      aviso.textContent = 'Confirmamos pelo WhatsApp ' +
+        (aCombinar && entrega ? 'os preços pendentes e a taxa de entrega' : aCombinar ? 'os preços pendentes' : 'a taxa de entrega') +
+        ', o valor final do pedido e o sinal de 50% antes do pagamento.';
       if (pag) mostrarErro('pagamento', '');
     }
     form.querySelectorAll('[name=pagamento]').forEach(function (r) {
@@ -1283,17 +1394,21 @@
       var itens = lerPedido();
       if (!itens.length) return;
       var nome = nomeEl.value.trim();
-      // Nome, retirada e pagamento são obrigatórios; o primeiro campo com erro recebe o foco.
+      // Nome, recebimento, agendamento e pagamento são obrigatórios; focar o primeiro erro.
       var primeiroErro = null;
       function exigir(campo, el, valido, msg) {
         mostrarErro(campo, valido ? '' : msg);
         if (!valido && !primeiroErro) primeiroErro = el;
       }
       exigir('nome', nomeEl, nome.length >= 2, 'Informe seu nome para continuar.');
-      exigir('data', dataEl, !!dataEl.value, 'Escolha o dia em que gostaria de retirar.');
-      exigir('hora', horaEl, !!horaEl.value, 'Informe o horário em que gostaria de retirar.');
+      var recebimento = recebimentoEscolhido();
+      exigir('recebimento', form.querySelector('[name=recebimento]'), !!recebimento, 'Escolha retirada ou entrega para continuar.');
+      exigir('data', dataEl, !!dataEl.value, recebimento === 'entrega'
+        ? 'Escolha o dia em que gostaria de receber.' : 'Escolha o dia em que gostaria de retirar.');
+      exigir('hora', horaEl, !!horaEl.value, recebimento === 'entrega'
+        ? 'Informe o horário em que gostaria de receber.' : 'Informe o horário em que gostaria de retirar.');
       var pag = form.querySelector('[name=pagamento]:checked');
-      exigir('pagamento', form.querySelector('[name=pagamento]'), !!pag, 'Escolha a forma de pagamento para continuar.');
+      exigir('pagamento', form.querySelector('[name=pagamento]'), !!pag, 'Escolha como pagar o sinal para continuar.');
       if (!conferirData() && !primeiroErro) {
         primeiroErro = dataEl.getAttribute('aria-invalid') === 'true' ? dataEl : horaEl;
       }
@@ -1303,6 +1418,7 @@
       }
       var dados = {
         nome: nome,
+        recebimento: recebimento,
         data: formatarData(dataEl.value),
         hora: horaEl.value,
         pagamento: pag ? pag.value : '',
@@ -1321,8 +1437,16 @@
       if (caixa) caixa.hidden = true;
       if (obrigado) {
         obrigado.hidden = false;
+        var aCombinar = resumoPedido(itens).combinar.length > 0;
+        var entrega = recebimento === 'entrega';
         var pixObrigado = obrigado.querySelector('[data-pix]');
-        if (pixObrigado) pixObrigado.hidden = dados.pagamento !== 'Pix';
+        if (pixObrigado) pixObrigado.hidden = dados.pagamento !== 'Pix' || entrega || aCombinar;
+        var orientacao = 'Confira e envie a mensagem no WhatsApp. ';
+        if (aCombinar || entrega) orientacao += 'Por lá, acertamos ' +
+          (aCombinar && entrega ? 'os produtos com valor a combinar e a taxa de entrega' : aCombinar ? 'os produtos com valor a combinar' : 'a taxa de entrega') +
+          ' e calculamos o sinal de 50% sobre o valor final do pedido. ';
+        obrigado.querySelector('[data-obrigado-texto]').textContent = orientacao +
+          'Seu pedido é confirmado após combinarmos os detalhes e recebermos o sinal.';
         var nomeSpan = obrigado.querySelector('[data-obrigado-nome]');
         if (nomeSpan) nomeSpan.textContent = nome.split(/\s+/)[0];
         obrigado.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1352,6 +1476,8 @@
       var novo = obrigado.querySelector('[data-novo]');
       if (novo) novo.addEventListener('click', function () {
         gravarPedido([]);
+        form.reset();
+        atualizarRecebimento();
         obrigado.hidden = true;
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1364,6 +1490,7 @@
         render();
       }
     });
+    atualizarRecebimento();
     render();
   }
 

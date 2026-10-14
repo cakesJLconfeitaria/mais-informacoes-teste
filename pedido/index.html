@@ -30,8 +30,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="../assets/site.js?v=8"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=36">
-    <script src="../assets/pedido.js?v=29" defer></script>
+    <link rel="stylesheet" href="../assets/site.css?v=37">
+    <script src="../assets/pedido.js?v=34" defer></script>
   </head>
   <body class="product-page pedido-page">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -165,23 +165,36 @@
             </div>
             <ul class="cart-list" data-lista aria-label="Itens do pedido">
             </ul>
-            <div class="summary" data-resumo hidden>
+            <div class="summary" data-resumo hidden aria-live="polite">
               <p class="order-deadline" data-prazo aria-live="polite"></p>
-              <div>
-                <span>Total dos itens</span>
+              <div data-subtotal-produtos>
+                <span data-total-produtos-rotulo>Total dos produtos</span>
                 <strong data-total>R$ 0,00</strong>
+              </div>
+              <div data-resumo-combinar hidden>
+                <span>Produtos com valor a combinar</span>
+                <strong data-quantidade-combinar></strong>
+              </div>
+              <div data-resumo-entrega hidden>
+                <span>Taxa de entrega</span>
+                <strong>Valor a combinar</strong>
+              </div>
+              <div data-total-final hidden>
+                <span data-total-final-rotulo>Total do pedido</span>
+                <strong>A confirmar</strong>
               </div>
               <div>
                 <span>Sinal de 50% para confirmar</span>
-                <strong data-sinal>R$ 0,00</strong>
+                <strong data-sinal>A definir</strong>
               </div>
-              <p class="hint" data-combinar hidden>Itens com valor a combinar não estão incluídos neste total. Confirmamos o valor deles com você pelo WhatsApp. O sinal de 50% é calculado sobre os itens com valor definido.</p>
+              <p class="hint" data-recebimento-aviso>Escolha retirada ou entrega para ver como confirmar o pedido.</p>
+              <p class="hint" data-combinar hidden>Os produtos com valor a combinar serão acertados e finalizados pelo WhatsApp. O sinal de 50% será calculado sobre o valor final do pedido.</p>
               <button type="button" class="limpar" data-limpar>Esvaziar pedido</button>
             </div>
           </div>
           <section class="thanks" data-obrigado hidden aria-live="polite">
             <h2 tabindex="-1">Seu pedido está pronto, <span data-obrigado-nome></span>!</h2>
-            <p>Confira e envie a mensagem no WhatsApp. Por lá, confirmamos a retirada e os detalhes. O pedido é confirmado com o pagamento do sinal.</p>
+            <p data-obrigado-texto>Confira e envie a mensagem no WhatsApp. Seu pedido é confirmado após combinarmos os detalhes e recebermos o sinal.</p>
             <a
               class="button"
               data-reenviar
@@ -245,10 +258,21 @@
               aria-describedby="erro-nome"
             ><small class="field-error" id="erro-nome" data-erro="nome" hidden></small>
           </label>
+          <div class="field">
+            <span id="recebimento-rotulo">Como você prefere receber? <em class="req">obrigatório</em></span>
+            <div class="choice-grid two" role="radiogroup" aria-labelledby="recebimento-rotulo" aria-required="true">
+              <label><input type="radio" name="recebimento" value="retirada" required aria-describedby="erro-recebimento recebimento-dica"><span>Retirada<small>Bela Vista 1, em Gravatal</small></span>
+              </label>
+              <label><input type="radio" name="recebimento" value="entrega" required aria-describedby="erro-recebimento recebimento-dica"><span>Entrega<small>Taxa a combinar pelo WhatsApp</small></span>
+              </label>
+            </div>
+            <small class="field-error" id="erro-recebimento" data-erro="recebimento" hidden></small>
+            <p class="hint pay-note" id="recebimento-dica" data-recebimento-dica>Escolha uma opção para continuar.</p>
+          </div>
           <div class="two-cols">
-            <label class="field"><span>Data de retirada <em class="req">obrigatório</em></span><input type="date" name="data" required aria-describedby="erro-data aviso-retirada"><small class="field-error" id="erro-data" data-erro="data" hidden></small>
+            <label class="field"><span><span data-rotulo-data>Data desejada</span> <em class="req">obrigatório</em></span><input type="date" name="data" required aria-describedby="erro-data aviso-retirada"><small class="field-error" id="erro-data" data-erro="data" hidden></small>
             </label>
-            <label class="field"><span>Horário de retirada <em class="req">obrigatório</em></span><input type="time" name="hora" required aria-describedby="erro-hora aviso-retirada"><small class="field-error" id="erro-hora" data-erro="hora" hidden></small>
+            <label class="field"><span><span data-rotulo-hora>Horário desejado</span> <em class="req">obrigatório</em></span><input type="time" name="hora" required aria-describedby="erro-hora aviso-retirada"><small class="field-error" id="erro-hora" data-erro="hora" hidden></small>
             </label>
           </div>
           <div class="aviso aviso-retirada" id="aviso-retirada" data-aviso-data role="alert" hidden>
@@ -264,6 +288,7 @@
               </label>
             </div>
             <small class="field-error" id="erro-pagamento" data-erro="pagamento" hidden></small>
+            <p class="hint pay-note" data-pagamento-pendente hidden>Confirmamos pelo WhatsApp os valores pendentes, o total do pedido e o sinal de 50% antes do pagamento.</p>
             <div class="pix-box" data-pix hidden>
               <div class="pix-head">
                 <span class="pix-label">Pix para o sinal</span>
@@ -292,9 +317,10 @@
                 </button>
               </div>
               <p class="pix-meta">Chave do tipo e-mail · Larissa Alexandre de Souza · Banco C6 S.A.</p>
-              <p class="pix-note">Seu pedido é confirmado com o pagamento do sinal. Envie a mensagem primeiro e, depois, avise na conversa quando pagar.</p>
+              <p class="pix-note">Envie a mensagem e aguarde combinarmos os detalhes antes de pagar. Seu pedido é confirmado após recebermos o sinal.</p>
             </div>
             <p class="pay-note" data-cartao-nota hidden>Enviamos o link de pagamento pelo WhatsApp.</p>
+            <p class="pay-note" data-pagamento-restante><strong>Restante na retirada ou na entrega:</strong> Você pode pagar os outros 50% por Pix, cartão pelo link de pagamento, cartão na maquininha ou dinheiro.</p>
           </div>
           <div class="optional-group" role="group" aria-label="Observações e restrições alimentares, opcional">
             <div class="optional-heading"><strong>Se quiser, conte mais</strong><span>opcional</span></div>
@@ -333,20 +359,22 @@
               <summary>Prazos e confirmação</summary>
               <p><strong>Tortas, Matilda e Bentô Cake:</strong> pedimos pelo menos 48 horas de antecedência.</p>
               <p><strong>Brownies e donuts:</strong> pedimos pelo menos 24 horas de antecedência.</p>
-              <p>Para confirmar seu pedido, você paga 50% do valor na encomenda e o restante na retirada.</p>
+              <p>Seu pedido é confirmado após combinarmos os detalhes e recebermos o sinal de 50% do valor total. O restante é pago na retirada ou na entrega.</p>
             </details>
             <details name="politica-encomendas">
               <summary>Pagamento</summary>
-              <p>Você pode pagar por Pix ou cartão de crédito ou débito. Para pagamentos com cartão, enviamos um link de pagamento.</p>
+              <p><strong>Sinal de 50%:</strong> Para confirmar sua encomenda, o sinal deve ser pago por Pix ou cartão de crédito ou débito pelo link de pagamento que enviamos.</p>
+              <p><strong>Restante na retirada ou na entrega:</strong> Você pode pagar os outros 50% por Pix, cartão pelo link de pagamento, cartão na maquininha ou dinheiro.</p>
             </details>
             <details name="politica-encomendas">
-              <summary>Retirada</summary>
-              <p>A retirada é no bairro Bela Vista 1, em Gravatal, em uma data e horário combinados com você. Não fazemos entregas.</p>
+              <summary>Retirada e entrega</summary>
+              <p>Você pode retirar sua encomenda no bairro Bela Vista 1, em Gravatal, em data e horário combinados. Se preferir, podemos combinar a entrega e o valor da taxa pelo WhatsApp.</p>
+              <p>Nos pedidos com entrega, combinamos a taxa antes da confirmação. O sinal de 50% é calculado sobre o valor dos produtos e a taxa de entrega.</p>
             </details>
             <details name="politica-encomendas">
               <summary>Conservação e transporte</summary>
-              <p>Nossos produtos são preparados artesanalmente e têm validade de até 6 dias sob refrigeração.</p>
-              <p>Não nos responsabilizamos por acidentes após a retirada.</p>
+              <p>Nossos produtos são preparados artesanalmente e têm validade de até 6 dias a partir da retirada ou entrega, desde que mantidos sob refrigeração.</p>
+              <p>Não nos responsabilizamos por danos causados pelo transporte ou manuseio inadequados pelo cliente após o recebimento da encomenda.</p>
             </details>
             <details name="politica-encomendas">
               <summary>Pesos e rendimentos</summary>
@@ -354,8 +382,10 @@
             </details>
             <details name="politica-encomendas">
               <summary>Cancelamento</summary>
-              <p><strong>Tortas, Matilda e Bentô Cake:</strong> pedidos cancelados com menos de 48 horas de antecedência não têm reembolso. Ao fazer o pedido, você concorda com a política de troca e cancelamento.</p>
+              <p><strong>Tortas, Matilda e Bentô Cake:</strong> em caso de cancelamento com pelo menos 48 horas de antecedência da retirada ou entrega agendada, você pode escolher entre a devolução integral do valor pago ou a remarcação da encomenda. A remarcação depende da nossa disponibilidade.</p>
+              <p>Para cancelamentos com menos de 48 horas de antecedência da retirada ou entrega agendada, o sinal de 50% não é devolvido.</p>
               <p><strong>Brownies e donuts:</strong> após a confirmação do pedido, o sinal não é devolvido em caso de cancelamento.</p>
+              <p>Ao fazer seu pedido, você concorda com as condições de cancelamento descritas acima.</p>
             </details>
             <details name="politica-encomendas">
               <summary>Dúvidas e restrições alimentares</summary>

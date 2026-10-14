@@ -3698,3 +3698,12 @@ h1,h2,h3,.torta-builder-start h2,.addons-head h2 {
     font-size: 17px;
   }
 }
+
+/* Separa os produtos com preço definido dos que serão combinados no atendimento. */
+.pedido-page .cart-group-heading h2 {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted);
+}
