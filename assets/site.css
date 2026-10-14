@@ -3642,6 +3642,7 @@ h1,h2,h3,.torta-builder-start h2,.addons-head h2 {
 }
 
 .checkout {
+  padding: 20px 16px;
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 8px;
